@@ -1,0 +1,89 @@
+{
+    // 使用 IntelliSense 了解相关属性。 
+    // 悬停以查看现有属性的描述。
+    // 欲了解更多信息，请访问: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+
+        {
+            "name": "Bert Original",
+            "type": "python",
+            "request": "launch",
+            "module": "bert.bert_original",
+            "console": "integratedTerminal",
+            "justMyCode": false
+        },
+        {
+            "name": "Bert Slice",
+            "type": "python",
+            "request": "launch",
+            "module": "bert.bert_slice",
+            "console": "integratedTerminal",
+            "justMyCode": false
+        },
+        {
+            "name": "GPT2 Slice",
+            "type": "python",
+            "request": "launch",
+            "module": "gpt2.gpt2_slice",
+            "console": "integratedTerminal",
+            "justMyCode": false
+        },
+        {
+            "name": "GPT2 Original",
+            "type": "python",
+            "request": "launch",
+            "module": "gpt2.gpt2_original",
+            "console": "integratedTerminal",
+            "justMyCode": false
+        },
+        {
+            "name": "test",
+            "type": "python",
+            "request": "launch",
+            "program": "memory_plot_test.py",
+            "console": "integratedTerminal",
+            "justMyCode": false
+        },
+        {
+            "name": "GPT2 SELECT n",
+            "type": "python",
+            "request": "launch",
+            "module": "gpt2.gpt2_select_n",
+            "console": "integratedTerminal",
+            "justMyCode": false
+        },
+        {
+            "name": "BERT SELECT n",
+            "type": "python",
+            "request": "launch",
+            "module": "bert.bert_select_n",
+            "console": "integratedTerminal",
+            "justMyCode": false
+        },
+        {
+            "name": "LLAMA Slice",
+            "type": "python",
+            "request": "launch",
+            "module": "llama.llama_slice",
+            "console": "integratedTerminal",
+            "justMyCode": false
+        },
+        {
+            "name": "LLAMA SELECT n",
+            "type": "python",
+            "request": "launch",
+            "module": "llama.llama_select_n",
+            "console": "integratedTerminal",
+            "justMyCode": false
+        },
+        {
+            "name": "test",
+            "type": "python",
+            "request": "launch",
+            "module": "test.offload_test",
+            "console": "integratedTerminal",
+            "justMyCode": false
+        }
+    ]
+}
