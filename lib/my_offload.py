@@ -582,19 +582,17 @@ class OffloadModel(nn.Module):
                 # inputs = self._activations[index]
                 inputs = last_inputs  # 叶博改的
                 # start = time.time()
-                # nvtx.range_push(f"shard {index} forward")
-                # print(f"index {index} on-time:", torch.cuda.memory_allocated(device=torch.device("cuda")))  # 显存量
-                # print(f"index {index} max:", torch.cuda.max_memory_allocated(device=torch.device("cuda")))  # 显存量
+                nvtx.range_push(f"shard {index} forward")
 
                 # inputs = self.model_slices[index](*inputs)[0]
                 torch.cuda.synchronize()  # 同步0909  为什么offload没同步？
                 # torch.cuda.current_stream().wait_stream(self.model_slices[index]._cpu_to_gpu_stream)
                 # self.model_slices[index]._cpu_to_gpu_stream.synchronize()
                 inputs = self.model_slices[index](*inputs)
-                print(f"iter {index}", inputs)  # debug
+                # print(f"iter {index}", inputs)  # debug
                 # print(f"index {index} on-time:", torch.cuda.memory_allocated(device=torch.device("cuda")))  # 显存量
                 # print(f"index {index} max:", torch.cuda.max_memory_allocated(device=torch.device("cuda")))  # 显存量
-                # nvtx.range_pop()
+                nvtx.range_pop()
                 # tmp = time.time() - start
                 # print("self.hh time:", tmp)  # debug
             # Call the custom autograd hooks (discard/load slices FW and BW)
@@ -609,6 +607,7 @@ class OffloadModel(nn.Module):
 
         # result = self._activations[-1]
         # result = tuple([r.cuda() for r in result])
+        # torch.cuda.synchronize()  # 在slice模式下，如果只在这里synchronize，bert的结果也不对
         result = last_inputs
-        print("result[0]", result[0])  # debug
+        # print("result[0]", result[0])  # debug
         return result[0] if len(result) == 1 else result

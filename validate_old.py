@@ -10,7 +10,6 @@ from lib.profiler import FlopsProfiler
 from metrics import AverageMeter, ProgressMeter
 from torch.nn.parallel import DistributedDataParallel
 from torch.utils.data import DataLoader
-from utils import DummyProfile
 
 
 def validate(
@@ -40,17 +39,15 @@ def validate(
 
     prof = FlopsProfiler(model)  # add profiler
     # prof_step = len(val_loader) // 3  # 整除3，所以会在33%的时候输出profile！
-    prof_step = 50  # debug
-
-    profiler = DummyProfile() if not profiling else torch.profiler.profile(record_shapes=True, profile_memory=True, with_stack=True)
-    results = []
+    prof_step = 3  # debug
 
     with torch.no_grad():
         end = time.time()
         gc.collect()
-        with profiler as p:
+        with fragile(torch.profiler.profile(record_shapes=True, profile_memory=True, with_stack=True)) as p:
+            batch_tile_list = []
             for i, (images, target) in enumerate(val_loader):
-                if i == prof_step and profiling:  # add profile
+                if i == prof_step:  # add profile
                     prof.start_profile()
                 if device_id is not None:
                     images = images.cuda(device_id, non_blocking=True)
@@ -58,13 +55,15 @@ def validate(
 
                 # compute output
                 output = model(images)
+                if(i == 1):
+                    pass
                 if model_name == "gpt2":
                     output = output.last_hidden_state
                 # print(model)
                 # loss = criterion(output[0], target)
                 # print("loss: ", loss)  # debug
 
-                if i == prof_step and profiling:  # add profile
+                if i == prof_step:  # add profile
                     prof.print_model_profile(profile_step=i)
                     prof.end_profile()
 
@@ -75,26 +74,26 @@ def validate(
                 # top5.update(acc5[0], images.size(0))
 
                 # measure elapsed time
-                torch.cuda.synchronize(torch.cuda.current_device())
-                batch_time.update(time.time() - end)
+                tmp = time.time() - end
+                batch_time.update(tmp)
+                batch_tile_list.append(tmp)
                 end = time.time()
 
                 if i % print_freq == 0:
                     progress.display(i)
-
-                max_allocated, allocated = torch.cuda.max_memory_allocated(device=torch.device("cuda")), torch.cuda.memory_allocated(device=torch.device("cuda"))
-                print(f"batch_time: {batch_time.val:.3f} ({batch_time.avg_without_first:.3f}), max_allocated: {max_allocated}, allocated: {allocated}")
-                if preserve_result:
-                    results.append(output)
+                    
+                print("end_max:", torch.cuda.max_memory_allocated(device=torch.device("cuda")))  # 显存量
+                print("end_now", torch.cuda.memory_allocated(device=torch.device("cuda")))  # 显存量
 
             gc.collect()
-        # p.export_memory_timeline(str(trace_dir.joinpath(f"linear_stack_{now}.html")), torch.cuda.current_device())
+        p.export_memory_timeline(str(trace_dir.joinpath(f"linear_stack_{now}.html")), torch.cuda.current_device())
 
+        print("batch_time_list", batch_tile_list)
 
         # TODO: this should also be done with the ProgressMeter
         # print(
         #     " * Acc@1 {top1.avg:.3f} Acc@5 {top5.avg:.3f}".format(top1=top1, top5=top5)
         # )
 
-    return results if preserve_result else None
+    return top1.avg
 

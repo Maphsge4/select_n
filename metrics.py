@@ -12,12 +12,18 @@ class AverageMeter:
         self.avg = 0
         self.sum = 0
         self.count = 0
+        self.avg_without_first = 0
+        self.sum_without_first = 0
 
     def update(self, val, n=1) -> None:
         self.val = val
         self.sum += val * n
         self.count += n
         self.avg = self.sum / self.count
+        assert n == 1
+        if self.count > 1:
+            self.sum_without_first += val * n
+            self.avg_without_first = self.sum_without_first / (self.count - 1)
 
     def __str__(self):
         fmtstr = "{name} {val" + self.fmt + "} ({avg" + self.fmt + "})"

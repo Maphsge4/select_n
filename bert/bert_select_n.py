@@ -23,7 +23,7 @@ from lib.select_n import OffloadModel
 from lib.transformers import BertConfig, BertForMaskedLM
 from torch.optim import SGD, Adam
 from utils import seed_all, get_parser
-from validate import validate
+from validate_old import validate
 from train import train
 
 
@@ -50,7 +50,7 @@ def main():
         num_slices=10, # 模型应分片的片数
         checkpoint_activation=False,
         num_microbatches=1,
-        device_list=[1,1,0,1,1,0,1,1,0,1,1,0,1,1,0,1,1,0,1,1,0,1,1,0]  # 1是在GPU内，0是不在
+        device_list=[1,0,1,1,1,0,1,1,0,1,1,0,1,1,0,1,1,0,1,1,0,1,1,0]  # 1是在GPU内，0是不在
     )
     model.bert.to_cuda()  # only load embeddings to cuda
     model.cls.cuda()  # load final lm head to cuda

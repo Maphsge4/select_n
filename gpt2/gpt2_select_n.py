@@ -13,7 +13,7 @@ from dummy_dataloader import prepare_dataloader
 from lib.select_n import OffloadModel
 from lib.transformers import GPT2Config, GPT2Model
 from utils import seed_all, get_parser
-from validate import validate
+from validate_old import validate
 from train import train
 
 model_name = 'gpt2'
@@ -49,7 +49,7 @@ def main():
     print("max:", torch.cuda.max_memory_allocated(device=torch.device("cuda")))  # 显存量
     print("now", torch.cuda.memory_allocated(device=torch.device("cuda")))  # 显存量
 
-    dataloader = prepare_dataloader(4 * args.batch_size, args.batch_size, config.vocab_size)  # 原来是4
+    dataloader = prepare_dataloader(2 * args.batch_size, args.batch_size, config.vocab_size)  # 原来是4
     optimizer = Adam(model.parameters(), lr=args.lr)
     criterion = nn.MSELoss()
     

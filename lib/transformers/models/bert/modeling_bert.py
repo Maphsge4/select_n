@@ -1033,7 +1033,6 @@ class BertModel(BertPreTrainedModel):
         )
         # 要改！
         # print("embeddings end on-time", torch.cuda.memory_allocated(device=torch.device("cuda")))  # 显存量
-        
         # 在这之前slice和original所有输出都一样
         encoder_outputs = self.encoder(
             embedding_output,
@@ -1047,6 +1046,7 @@ class BertModel(BertPreTrainedModel):
             output_hidden_states=output_hidden_states,
             return_dict=return_dict,
         )
+        # print(encoder_outputs)  # debug
         
         # convert to BaseModelOutputWithPastAndCrossAttentions, consistent with BertModel output
         encoder_outputs = BaseModelOutputWithPastAndCrossAttentions(
@@ -1401,7 +1401,7 @@ class BertForMaskedLM(BertPreTrainedModel):
         # print("bert end on-time", torch.cuda.memory_allocated(device=torch.device("cuda")))  # 显存量
 
         sequence_output = outputs[0]
-        print("sequence output shape", sequence_output.shape)  # 叶博0909让加的
+        # print("sequence output shape", sequence_output.shape)  # 叶博0909让加的
         prediction_scores = self.cls(sequence_output)
         # print("cls end on-time", torch.cuda.memory_allocated(device=torch.device("cuda")))  # 显存量
 

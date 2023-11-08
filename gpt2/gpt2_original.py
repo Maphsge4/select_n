@@ -11,7 +11,7 @@ from lib.transformers import GPT2Config, GPT2Model
 from torch.optim import SGD, Adam
 from train import train
 from utils import get_parser, seed_all
-from validate import validate
+from validate_old import validate
 
 model_name = "gpt2"
 
@@ -29,7 +29,7 @@ def main():
     model.cuda()
     print(f"=> model params: {sum(p.numel() for p in model.parameters())}")
 
-    dataloader = prepare_dataloader(2 * args.batch_size, args.batch_size, config.vocab_size)
+    dataloader = prepare_dataloader(2 * args.batch_size, args.batch_size, config.vocab_size)  # 原来是4
     optimizer = Adam(model.parameters(), lr=args.lr)
     criterion = nn.MSELoss()
 

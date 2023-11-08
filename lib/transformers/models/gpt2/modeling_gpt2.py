@@ -1011,6 +1011,7 @@ class GPT2Model(GPT2PreTrainedModel):
             # print("self.hh time:", tmp)  # debug
             # print("hh_end:", torch.cuda.memory_allocated(device=torch.device("cuda")))  # 显存量
 
+        # print(hidden_states)  # debug
         hidden_states = self.ln_f(hidden_states)
         # print("ln_f_end:", torch.cuda.memory_allocated(device=torch.device("cuda")))  # 显存量
 

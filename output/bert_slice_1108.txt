@@ -1,0 +1,900 @@
+=> set cuda device = 0
+=> model params: 335174458
+Test: [0/4]	Time  2.644 ( 2.644)
+end_max: 2301934080
+end_now 2166667776
+end_max: 4302617088
+end_now 2166667776
+end_max: 4302617088
+end_now 2166667776
+
+-------------------------- DeepSpeed Flops Profiler --------------------------
+Profile Summary at step 3:
+Notations:
+data parallel size (dp_size), model parallel size(mp_size),
+number of parameters (params), number of multiply-accumulate operations(MACs),
+number of floating-point operations (flops), floating-point operations per second (FLOPS),
+fwd latency (forward propagation latency), bwd latency (backward propagation latency),
+step (weights update latency), iter latency (sum of fwd, bwd and step latency)
+
+params per gpu:                                               335.17 M
+params of model = params per GPU * mp_size:                   335.17 M
+fwd MACs per GPU:                                             5889.37 GMACs
+fwd flops per GPU:                                            11786.16 G
+fwd flops of model = fwd flops per GPU * mp_size:             11786.16 G
+fwd latency:                                                  1.32 s  
+fwd FLOPS per GPU = fwd flops per GPU / fwd latency:          8.92 TFLOPS
+
+----------------------------- Aggregated Profile per GPU -----------------------------
+Top 1 modules in terms of params, MACs or fwd latency at different model depths:
+depth 0:
+    params      - {'BertForMaskedLM': '335.17 M'}
+    MACs        - {'BertForMaskedLM': '5889.37 GMACs'}
+    fwd latency - {'BertForMaskedLM': '1.32 s'}
+depth 1:
+    params      - {'BertModel': '334.09 M'}
+    MACs        - {'BertModel': '5360.12 GMACs'}
+    fwd latency - {'BertModel': '1.22 s'}
+depth 2:
+    params      - {'OffloadModel': '302.31 M'}
+    MACs        - {'OffloadModel': '5360.12 GMACs'}
+    fwd latency - {'OffloadModel': '1.22 s'}
+depth 3:
+    params      - {'Sequential': '302.31 M'}
+    MACs        - {'Sequential': '5360.12 GMACs'}
+    fwd latency - {'Sequential': '1.14 s'}
+depth 4:
+    params      - {'ModelShard': '302.31 M'}
+    MACs        - {'ModelShard': '5360.12 GMACs'}
+    fwd latency - {'ModelShard': '1.14 s'}
+depth 5:
+    params      - {'BertLayer': '302.31 M'}
+    MACs        - {'BertLayer': '5360.12 GMACs'}
+    fwd latency - {'BertLayer': '1.14 s'}
+depth 6:
+    params      - {'BertAttention': '100.81 M'}
+    MACs        - {'BertAttention': '2061.58 GMACs'}
+    fwd latency - {'BertAttention': '565.09 ms'}
+depth 7:
+    params      - {'Linear': '201.45 M'}
+    MACs        - {'Linear': '3298.53 GMACs'}
+    fwd latency - {'Linear': '506.81 ms'}
+
+------------------------------ Detailed Profile per GPU ------------------------------
+Each module profile is listed after its name in the following order: 
+params, percentage of total params, MACs, percentage of total MACs, fwd latency, percentage of total fwd latency, fwd FLOPS
+
+Note: 1. A module can have torch.nn.module or torch.nn.functional to compute logits (e.g. CrossEntropyLoss). They are not counted as submodules, thus not to be printed out. However they make up the difference between a parent's MACs (or latency) and the sum of its submodules'.
+2. Number of floating-point operations is a theoretical estimation, thus FLOPS computed using that could be larger than the maximum system throughput.
+3. The fwd latency listed in the top module's profile is directly captured at the module forward function in PyTorch, thus it's less than the fwd latency shown above which is captured in DeepSpeed.
+
+BertForMaskedLM(
+  335.17 M, 100.00% Params, 5889.37 GMACs, 100.00% MACs, 1.32 s, 100.00% latency, 8.92 TFLOPS, 
+  (bert): BertModel(
+    334.09 M, 99.68% Params, 5360.12 GMACs, 91.01% MACs, 1.22 s, 92.48% latency, 8.78 TFLOPS, 
+    (embeddings): BertEmbeddings(
+      31.78 M, 9.48% Params, 0 MACs, 0.00% MACs, 2.83 ms, 0.21% latency, 29.67 GFLOPS, 
+      (word_embeddings): Embedding(31.25 M, 9.32% Params, 0 MACs, 0.00% MACs, 514.62 us, 0.04% latency, 0.0 FLOPS, 30522, 1024, padding_idx=0)
+      (position_embeddings): Embedding(524.29 k, 0.16% Params, 0 MACs, 0.00% MACs, 20.35 us, 0.00% latency, 0.0 FLOPS, 512, 1024)
+      (token_type_embeddings): Embedding(2.05 k, 0.00% Params, 0 MACs, 0.00% MACs, 494.34 us, 0.04% latency, 0.0 FLOPS, 2, 1024)
+      (LayerNorm): LayerNorm(2.05 k, 0.00% Params, 0 MACs, 0.00% MACs, 369.98 us, 0.03% latency, 226.73 GFLOPS, (1024,), eps=1e-12, elementwise_affine=True)
+      (dropout): Dropout(0, 0.00% Params, 0 MACs, 0.00% MACs, 57.82 us, 0.00% latency, 0.0 FLOPS, p=0.1, inplace=False)
+    )
+    (encoder): OffloadModel(
+      302.31 M, 90.19% Params, 5360.12 GMACs, 91.01% MACs, 1.22 s, 92.19% latency, 8.8 TFLOPS, 
+      (_model): Sequential(
+        302.31 M, 90.19% Params, 5360.12 GMACs, 91.01% MACs, 1.14 s, 86.39% latency, 9.39 TFLOPS, 
+        (0): ModelShard(
+          12.6 M, 3.76% Params, 223.34 GMACs, 3.79% MACs, 51.77 ms, 3.92% latency, 8.63 TFLOPS, 
+          (model_shard): BertLayer(
+            12.6 M, 3.76% Params, 223.34 GMACs, 3.79% MACs, 51.63 ms, 3.91% latency, 8.66 TFLOPS, 
+            (attention): BertAttention(
+              4.2 M, 1.25% Params, 85.9 GMACs, 1.46% MACs, 26.35 ms, 1.99% latency, 6.53 TFLOPS, 
+              (self): BertSelfAttention(
+                3.15 M, 0.94% Params, 68.72 GMACs, 1.17% MACs, 21.89 ms, 1.66% latency, 6.28 TFLOPS, 
+                (query): Linear(1.05 M, 0.31% Params, 17.18 GMACs, 0.29% MACs, 3.66 ms, 0.28% latency, 9.39 TFLOPS, in_features=1024, out_features=1024, bias=True)
+                (key): Linear(1.05 M, 0.31% Params, 17.18 GMACs, 0.29% MACs, 3.45 ms, 0.26% latency, 9.97 TFLOPS, in_features=1024, out_features=1024, bias=True)
+                (value): Linear(1.05 M, 0.31% Params, 17.18 GMACs, 0.29% MACs, 3.41 ms, 0.26% latency, 10.09 TFLOPS, in_features=1024, out_features=1024, bias=True)
+                (dropout): Dropout(0, 0.00% Params, 0 MACs, 0.00% MACs, 1.89 us, 0.00% latency, 0.0 FLOPS, p=0.1, inplace=False)
+              )
+              (output): BertSelfOutput(
+                1.05 M, 0.31% Params, 17.18 GMACs, 0.29% MACs, 4.22 ms, 0.32% latency, 8.17 TFLOPS, 
+                (dense): Linear(1.05 M, 0.31% Params, 17.18 GMACs, 0.29% MACs, 3.09 ms, 0.23% latency, 11.1 TFLOPS, in_features=1024, out_features=1024, bias=True)
+                (LayerNorm): LayerNorm(2.05 k, 0.00% Params, 0 MACs, 0.00% MACs, 373.86 us, 0.03% latency, 224.38 GFLOPS, (1024,), eps=1e-12, elementwise_affine=True)
+                (dropout): Dropout(0, 0.00% Params, 0 MACs, 0.00% MACs, 47.42 us, 0.00% latency, 0.0 FLOPS, p=0.1, inplace=False)
+              )
+            )
+            (intermediate): BertIntermediate(
+              4.2 M, 1.25% Params, 68.72 GMACs, 1.17% MACs, 12.65 ms, 0.96% latency, 10.87 TFLOPS, 
+              (dense): Linear(4.2 M, 1.25% Params, 68.72 GMACs, 1.17% MACs, 11.32 ms, 0.86% latency, 12.14 TFLOPS, in_features=1024, out_features=4096, bias=True)
+              (intermediate_act_fn): GELUActivation(0, 0.00% Params, 0 MACs, 0.00% MACs, 1.14 ms, 0.09% latency, 0.0 FLOPS, )
+            )
+            (output): BertOutput(
+              4.2 M, 1.25% Params, 68.72 GMACs, 1.17% MACs, 12.25 ms, 0.93% latency, 11.23 TFLOPS, 
+              (dense): Linear(4.2 M, 1.25% Params, 68.72 GMACs, 1.17% MACs, 11.15 ms, 0.84% latency, 12.33 TFLOPS, in_features=4096, out_features=1024, bias=True)
+              (LayerNorm): LayerNorm(2.05 k, 0.00% Params, 0 MACs, 0.00% MACs, 375.14 us, 0.03% latency, 223.62 GFLOPS, (1024,), eps=1e-12, elementwise_affine=True)
+              (dropout): Dropout(0, 0.00% Params, 0 MACs, 0.00% MACs, 47.78 us, 0.00% latency, 0.0 FLOPS, p=0.1, inplace=False)
+            )
+          )
+        )
+        (1): ModelShard(
+          12.6 M, 3.76% Params, 223.34 GMACs, 3.79% MACs, 47.47 ms, 3.59% latency, 9.42 TFLOPS, 
+          (model_shard): BertLayer(
+            12.6 M, 3.76% Params, 223.34 GMACs, 3.79% MACs, 47.35 ms, 3.58% latency, 9.44 TFLOPS, 
+            (attention): BertAttention(
+              4.2 M, 1.25% Params, 85.9 GMACs, 1.46% MACs, 23.61 ms, 1.79% latency, 7.29 TFLOPS, 
+              (self): BertSelfAttention(
+                3.15 M, 0.94% Params, 68.72 GMACs, 1.17% MACs, 19.49 ms, 1.47% latency, 7.06 TFLOPS, 
+                (query): Linear(1.05 M, 0.31% Params, 17.18 GMACs, 0.29% MACs, 3.02 ms, 0.23% latency, 11.39 TFLOPS, in_features=1024, out_features=1024, bias=True)
+                (key): Linear(1.05 M, 0.31% Params, 17.18 GMACs, 0.29% MACs, 3.1 ms, 0.23% latency, 11.07 TFLOPS, in_features=1024, out_features=1024, bias=True)
+                (value): Linear(1.05 M, 0.31% Params, 17.18 GMACs, 0.29% MACs, 2.82 ms, 0.21% latency, 12.2 TFLOPS, in_features=1024, out_features=1024, bias=True)
+                (dropout): Dropout(0, 0.00% Params, 0 MACs, 0.00% MACs, 1.89 us, 0.00% latency, 0.0 FLOPS, p=0.1, inplace=False)
+              )
+              (output): BertSelfOutput(
+                1.05 M, 0.31% Params, 17.18 GMACs, 0.29% MACs, 3.91 ms, 0.30% latency, 8.81 TFLOPS, 
+                (dense): Linear(1.05 M, 0.31% Params, 17.18 GMACs, 0.29% MACs, 2.8 ms, 0.21% latency, 12.25 TFLOPS, in_features=1024, out_features=1024, bias=True)
+                (LayerNorm): LayerNorm(2.05 k, 0.00% Params, 0 MACs, 0.00% MACs, 367.17 us, 0.03% latency, 228.47 GFLOPS, (1024,), eps=1e-12, elementwise_affine=True)
+                (dropout): Dropout(0, 0.00% Params, 0 MACs, 0.00% MACs, 47.52 us, 0.00% latency, 0.0 FLOPS, p=0.1, inplace=False)
+              )
+            )
+            (intermediate): BertIntermediate(
+              4.2 M, 1.25% Params, 68.72 GMACs, 1.17% MACs, 11.83 ms, 0.89% latency, 11.62 TFLOPS, 
+              (dense): Linear(4.2 M, 1.25% Params, 68.72 GMACs, 1.17% MACs, 10.49 ms, 0.79% latency, 13.1 TFLOPS, in_features=1024, out_features=4096, bias=True)
+              (intermediate_act_fn): GELUActivation(0, 0.00% Params, 0 MACs, 0.00% MACs, 1.13 ms, 0.09% latency, 0.0 FLOPS, )
+            )
+            (output): BertOutput(
+              4.2 M, 1.25% Params, 68.72 GMACs, 1.17% MACs, 11.57 ms, 0.87% latency, 11.89 TFLOPS, 
+              (dense): Linear(4.2 M, 1.25% Params, 68.72 GMACs, 1.17% MACs, 10.45 ms, 0.79% latency, 13.15 TFLOPS, in_features=4096, out_features=1024, bias=True)
+              (LayerNorm): LayerNorm(2.05 k, 0.00% Params, 0 MACs, 0.00% MACs, 365.31 us, 0.03% latency, 229.63 GFLOPS, (1024,), eps=1e-12, elementwise_affine=True)
+              (dropout): Dropout(0, 0.00% Params, 0 MACs, 0.00% MACs, 47.33 us, 0.00% latency, 0.0 FLOPS, p=0.1, inplace=False)
+            )
+          )
+        )
+        (2): ModelShard(
+          12.6 M, 3.76% Params, 223.34 GMACs, 3.79% MACs, 47.78 ms, 3.61% latency, 9.36 TFLOPS, 
+          (model_shard): BertLayer(
+            12.6 M, 3.76% Params, 223.34 GMACs, 3.79% MACs, 47.66 ms, 3.61% latency, 9.38 TFLOPS, 
+            (attention): BertAttention(
+              4.2 M, 1.25% Params, 85.9 GMACs, 1.46% MACs, 23.48 ms, 1.78% latency, 7.33 TFLOPS, 
+              (self): BertSelfAttention(
+                3.15 M, 0.94% Params, 68.72 GMACs, 1.17% MACs, 19.28 ms, 1.46% latency, 7.14 TFLOPS, 
+                (query): Linear(1.05 M, 0.31% Params, 17.18 GMACs, 0.29% MACs, 2.91 ms, 0.22% latency, 11.82 TFLOPS, in_features=1024, out_features=1024, bias=True)
+                (key): Linear(1.05 M, 0.31% Params, 17.18 GMACs, 0.29% MACs, 2.89 ms, 0.22% latency, 11.88 TFLOPS, in_features=1024, out_features=1024, bias=True)
+                (value): Linear(1.05 M, 0.31% Params, 17.18 GMACs, 0.29% MACs, 2.91 ms, 0.22% latency, 11.83 TFLOPS, in_features=1024, out_features=1024, bias=True)
+                (dropout): Dropout(0, 0.00% Params, 0 MACs, 0.00% MACs, 1.89 us, 0.00% latency, 0.0 FLOPS, p=0.1, inplace=False)
+              )
+              (output): BertSelfOutput(
+                1.05 M, 0.31% Params, 17.18 GMACs, 0.29% MACs, 3.98 ms, 0.30% latency, 8.65 TFLOPS, 
+                (dense): Linear(1.05 M, 0.31% Params, 17.18 GMACs, 0.29% MACs, 2.87 ms, 0.22% latency, 11.99 TFLOPS, in_features=1024, out_features=1024, bias=True)
+                (LayerNorm): LayerNorm(2.05 k, 0.00% Params, 0 MACs, 0.00% MACs, 384.1 us, 0.03% latency, 218.4 GFLOPS, (1024,), eps=1e-12, elementwise_affine=True)
+                (dropout): Dropout(0, 0.00% Params, 0 MACs, 0.00% MACs, 46.5 us, 0.00% latency, 0.0 FLOPS, p=0.1, inplace=False)
+              )
+            )
+            (intermediate): BertIntermediate(
+              4.2 M, 1.25% Params, 68.72 GMACs, 1.17% MACs, 12.01 ms, 0.91% latency, 11.44 TFLOPS, 
+              (dense): Linear(4.2 M, 1.25% Params, 68.72 GMACs, 1.17% MACs, 10.68 ms, 0.81% latency, 12.87 TFLOPS, in_features=1024, out_features=4096, bias=True)
+              (intermediate_act_fn): GELUActivation(0, 0.00% Params, 0 MACs, 0.00% MACs, 1.13 ms, 0.09% latency, 0.0 FLOPS, )
+            )
+            (output): BertOutput(
+              4.2 M, 1.25% Params, 68.72 GMACs, 1.17% MACs, 11.8 ms, 0.89% latency, 11.65 TFLOPS, 
+              (dense): Linear(4.2 M, 1.25% Params, 68.72 GMACs, 1.17% MACs, 10.69 ms, 0.81% latency, 12.85 TFLOPS, in_features=4096, out_features=1024, bias=True)
+              (LayerNorm): LayerNorm(2.05 k, 0.00% Params, 0 MACs, 0.00% MACs, 365.86 us, 0.03% latency, 229.29 GFLOPS, (1024,), eps=1e-12, elementwise_affine=True)
+              (dropout): Dropout(0, 0.00% Params, 0 MACs, 0.00% MACs, 48.61 us, 0.00% latency, 0.0 FLOPS, p=0.1, inplace=False)
+            )
+          )
+        )
+        (3): ModelShard(
+          12.6 M, 3.76% Params, 223.34 GMACs, 3.79% MACs, 46.39 ms, 3.51% latency, 9.64 TFLOPS, 
+          (model_shard): BertLayer(
+            12.6 M, 3.76% Params, 223.34 GMACs, 3.79% MACs, 46.27 ms, 3.50% latency, 9.66 TFLOPS, 
+            (attention): BertAttention(
+              4.2 M, 1.25% Params, 85.9 GMACs, 1.46% MACs, 22.98 ms, 1.74% latency, 7.49 TFLOPS, 
+              (self): BertSelfAttention(
+                3.15 M, 0.94% Params, 68.72 GMACs, 1.17% MACs, 18.9 ms, 1.43% latency, 7.28 TFLOPS, 
+                (query): Linear(1.05 M, 0.31% Params, 17.18 GMACs, 0.29% MACs, 2.91 ms, 0.22% latency, 11.82 TFLOPS, in_features=1024, out_features=1024, bias=True)
+                (key): Linear(1.05 M, 0.31% Params, 17.18 GMACs, 0.29% MACs, 2.86 ms, 0.22% latency, 12.0 TFLOPS, in_features=1024, out_features=1024, bias=True)
+                (value): Linear(1.05 M, 0.31% Params, 17.18 GMACs, 0.29% MACs, 2.73 ms, 0.21% latency, 12.57 TFLOPS, in_features=1024, out_features=1024, bias=True)
+                (dropout): Dropout(0, 0.00% Params, 0 MACs, 0.00% MACs, 1.89 us, 0.00% latency, 0.0 FLOPS, p=0.1, inplace=False)
+              )
+              (output): BertSelfOutput(
+                1.05 M, 0.31% Params, 17.18 GMACs, 0.29% MACs, 3.86 ms, 0.29% latency, 8.93 TFLOPS, 
+                (dense): Linear(1.05 M, 0.31% Params, 17.18 GMACs, 0.29% MACs, 2.75 ms, 0.21% latency, 12.48 TFLOPS, in_features=1024, out_features=1024, bias=True)
+                (LayerNorm): LayerNorm(2.05 k, 0.00% Params, 0 MACs, 0.00% MACs, 373.38 us, 0.03% latency, 224.67 GFLOPS, (1024,), eps=1e-12, elementwise_affine=True)
+                (dropout): Dropout(0, 0.00% Params, 0 MACs, 0.00% MACs, 44.38 us, 0.00% latency, 0.0 FLOPS, p=0.1, inplace=False)
+              )
+            )
+            (intermediate): BertIntermediate(
+              4.2 M, 1.25% Params, 68.72 GMACs, 1.17% MACs, 11.6 ms, 0.88% latency, 11.85 TFLOPS, 
+              (dense): Linear(4.2 M, 1.25% Params, 68.72 GMACs, 1.17% MACs, 10.27 ms, 0.78% latency, 13.39 TFLOPS, in_features=1024, out_features=4096, bias=True)
+              (intermediate_act_fn): GELUActivation(0, 0.00% Params, 0 MACs, 0.00% MACs, 1.14 ms, 0.09% latency, 0.0 FLOPS, )
+            )
+            (output): BertOutput(
+              4.2 M, 1.25% Params, 68.72 GMACs, 1.17% MACs, 11.3 ms, 0.86% latency, 12.17 TFLOPS, 
+              (dense): Linear(4.2 M, 1.25% Params, 68.72 GMACs, 1.17% MACs, 10.2 ms, 0.77% latency, 13.47 TFLOPS, in_features=4096, out_features=1024, bias=True)
+              (LayerNorm): LayerNorm(2.05 k, 0.00% Params, 0 MACs, 0.00% MACs, 363.87 us, 0.03% latency, 230.54 GFLOPS, (1024,), eps=1e-12, elementwise_affine=True)
+              (dropout): Dropout(0, 0.00% Params, 0 MACs, 0.00% MACs, 55.9 us, 0.00% latency, 0.0 FLOPS, p=0.1, inplace=False)
+            )
+          )
+        )
+        (4): ModelShard(
+          12.6 M, 3.76% Params, 223.34 GMACs, 3.79% MACs, 47.98 ms, 3.63% latency, 9.32 TFLOPS, 
+          (model_shard): BertLayer(
+            12.6 M, 3.76% Params, 223.34 GMACs, 3.79% MACs, 47.87 ms, 3.62% latency, 9.34 TFLOPS, 
+            (attention): BertAttention(
+              4.2 M, 1.25% Params, 85.9 GMACs, 1.46% MACs, 23.54 ms, 1.78% latency, 7.31 TFLOPS, 
+              (self): BertSelfAttention(
+                3.15 M, 0.94% Params, 68.72 GMACs, 1.17% MACs, 19.3 ms, 1.46% latency, 7.13 TFLOPS, 
+                (query): Linear(1.05 M, 0.31% Params, 17.18 GMACs, 0.29% MACs, 2.9 ms, 0.22% latency, 11.84 TFLOPS, in_features=1024, out_features=1024, bias=True)
+                (key): Linear(1.05 M, 0.31% Params, 17.18 GMACs, 0.29% MACs, 2.88 ms, 0.22% latency, 11.92 TFLOPS, in_features=1024, out_features=1024, bias=True)
+                (value): Linear(1.05 M, 0.31% Params, 17.18 GMACs, 0.29% MACs, 2.88 ms, 0.22% latency, 11.93 TFLOPS, in_features=1024, out_features=1024, bias=True)
+                (dropout): Dropout(0, 0.00% Params, 0 MACs, 0.00% MACs, 1.89 us, 0.00% latency, 0.0 FLOPS, p=0.1, inplace=False)
+              )
+              (output): BertSelfOutput(
+                1.05 M, 0.31% Params, 17.18 GMACs, 0.29% MACs, 4.03 ms, 0.30% latency, 8.56 TFLOPS, 
+                (dense): Linear(1.05 M, 0.31% Params, 17.18 GMACs, 0.29% MACs, 2.9 ms, 0.22% latency, 11.83 TFLOPS, in_features=1024, out_features=1024, bias=True)
+                (LayerNorm): LayerNorm(2.05 k, 0.00% Params, 0 MACs, 0.00% MACs, 376.35 us, 0.03% latency, 222.89 GFLOPS, (1024,), eps=1e-12, elementwise_affine=True)
+                (dropout): Dropout(0, 0.00% Params, 0 MACs, 0.00% MACs, 45.6 us, 0.00% latency, 0.0 FLOPS, p=0.1, inplace=False)
+              )
+            )
+            (intermediate): BertIntermediate(
+              4.2 M, 1.25% Params, 68.72 GMACs, 1.17% MACs, 12.13 ms, 0.92% latency, 11.33 TFLOPS, 
+              (dense): Linear(4.2 M, 1.25% Params, 68.72 GMACs, 1.17% MACs, 10.8 ms, 0.82% latency, 12.73 TFLOPS, in_features=1024, out_features=4096, bias=True)
+              (intermediate_act_fn): GELUActivation(0, 0.00% Params, 0 MACs, 0.00% MACs, 1.14 ms, 0.09% latency, 0.0 FLOPS, )
+            )
+            (output): BertOutput(
+              4.2 M, 1.25% Params, 68.72 GMACs, 1.17% MACs, 11.81 ms, 0.89% latency, 11.65 TFLOPS, 
+              (dense): Linear(4.2 M, 1.25% Params, 68.72 GMACs, 1.17% MACs, 10.7 ms, 0.81% latency, 12.85 TFLOPS, in_features=4096, out_features=1024, bias=True)
+              (LayerNorm): LayerNorm(2.05 k, 0.00% Params, 0 MACs, 0.00% MACs, 369.44 us, 0.03% latency, 227.06 GFLOPS, (1024,), eps=1e-12, elementwise_affine=True)
+              (dropout): Dropout(0, 0.00% Params, 0 MACs, 0.00% MACs, 58.5 us, 0.00% latency, 0.0 FLOPS, p=0.1, inplace=False)
+            )
+          )
+        )
+        (5): ModelShard(
+          12.6 M, 3.76% Params, 223.34 GMACs, 3.79% MACs, 46.56 ms, 3.52% latency, 9.6 TFLOPS, 
+          (model_shard): BertLayer(
+            12.6 M, 3.76% Params, 223.34 GMACs, 3.79% MACs, 46.42 ms, 3.51% latency, 9.63 TFLOPS, 
+            (attention): BertAttention(
+              4.2 M, 1.25% Params, 85.9 GMACs, 1.46% MACs, 23.11 ms, 1.75% latency, 7.44 TFLOPS, 
+              (self): BertSelfAttention(
+                3.15 M, 0.94% Params, 68.72 GMACs, 1.17% MACs, 19.01 ms, 1.44% latency, 7.24 TFLOPS, 
+                (query): Linear(1.05 M, 0.31% Params, 17.18 GMACs, 0.29% MACs, 2.9 ms, 0.22% latency, 11.86 TFLOPS, in_features=1024, out_features=1024, bias=True)
+                (key): Linear(1.05 M, 0.31% Params, 17.18 GMACs, 0.29% MACs, 2.85 ms, 0.22% latency, 12.07 TFLOPS, in_features=1024, out_features=1024, bias=True)
+                (value): Linear(1.05 M, 0.31% Params, 17.18 GMACs, 0.29% MACs, 2.78 ms, 0.21% latency, 12.35 TFLOPS, in_features=1024, out_features=1024, bias=True)
+                (dropout): Dropout(0, 0.00% Params, 0 MACs, 0.00% MACs, 1.89 us, 0.00% latency, 0.0 FLOPS, p=0.1, inplace=False)
+              )
+              (output): BertSelfOutput(
+                1.05 M, 0.31% Params, 17.18 GMACs, 0.29% MACs, 3.9 ms, 0.30% latency, 8.83 TFLOPS, 
+                (dense): Linear(1.05 M, 0.31% Params, 17.18 GMACs, 0.29% MACs, 2.79 ms, 0.21% latency, 12.31 TFLOPS, in_features=1024, out_features=1024, bias=True)
+                (LayerNorm): LayerNorm(2.05 k, 0.00% Params, 0 MACs, 0.00% MACs, 379.71 us, 0.03% latency, 220.92 GFLOPS, (1024,), eps=1e-12, elementwise_affine=True)
+                (dropout): Dropout(0, 0.00% Params, 0 MACs, 0.00% MACs, 44.16 us, 0.00% latency, 0.0 FLOPS, p=0.1, inplace=False)
+              )
+            )
+            (intermediate): BertIntermediate(
+              4.2 M, 1.25% Params, 68.72 GMACs, 1.17% MACs, 11.62 ms, 0.88% latency, 11.83 TFLOPS, 
+              (dense): Linear(4.2 M, 1.25% Params, 68.72 GMACs, 1.17% MACs, 10.28 ms, 0.78% latency, 13.37 TFLOPS, in_features=1024, out_features=4096, bias=True)
+              (intermediate_act_fn): GELUActivation(0, 0.00% Params, 0 MACs, 0.00% MACs, 1.14 ms, 0.09% latency, 0.0 FLOPS, )
+            )
+            (output): BertOutput(
+              4.2 M, 1.25% Params, 68.72 GMACs, 1.17% MACs, 11.32 ms, 0.86% latency, 12.15 TFLOPS, 
+              (dense): Linear(4.2 M, 1.25% Params, 68.72 GMACs, 1.17% MACs, 10.21 ms, 0.77% latency, 13.47 TFLOPS, in_features=4096, out_features=1024, bias=True)
+              (LayerNorm): LayerNorm(2.05 k, 0.00% Params, 0 MACs, 0.00% MACs, 369.44 us, 0.03% latency, 227.06 GFLOPS, (1024,), eps=1e-12, elementwise_affine=True)
+              (dropout): Dropout(0, 0.00% Params, 0 MACs, 0.00% MACs, 47.23 us, 0.00% latency, 0.0 FLOPS, p=0.1, inplace=False)
+            )
+          )
+        )
+        (6): ModelShard(
+          12.6 M, 3.76% Params, 223.34 GMACs, 3.79% MACs, 47.72 ms, 3.61% latency, 9.37 TFLOPS, 
+          (model_shard): BertLayer(
+            12.6 M, 3.76% Params, 223.34 GMACs, 3.79% MACs, 47.61 ms, 3.60% latency, 9.39 TFLOPS, 
+            (attention): BertAttention(
+              4.2 M, 1.25% Params, 85.9 GMACs, 1.46% MACs, 23.45 ms, 1.77% latency, 7.34 TFLOPS, 
+              (self): BertSelfAttention(
+                3.15 M, 0.94% Params, 68.72 GMACs, 1.17% MACs, 19.26 ms, 1.46% latency, 7.14 TFLOPS, 
+                (query): Linear(1.05 M, 0.31% Params, 17.18 GMACs, 0.29% MACs, 2.91 ms, 0.22% latency, 11.81 TFLOPS, in_features=1024, out_features=1024, bias=True)
+                (key): Linear(1.05 M, 0.31% Params, 17.18 GMACs, 0.29% MACs, 2.9 ms, 0.22% latency, 11.86 TFLOPS, in_features=1024, out_features=1024, bias=True)
+                (value): Linear(1.05 M, 0.31% Params, 17.18 GMACs, 0.29% MACs, 2.89 ms, 0.22% latency, 11.9 TFLOPS, in_features=1024, out_features=1024, bias=True)
+                (dropout): Dropout(0, 0.00% Params, 0 MACs, 0.00% MACs, 1.86 us, 0.00% latency, 0.0 FLOPS, p=0.1, inplace=False)
+              )
+              (output): BertSelfOutput(
+                1.05 M, 0.31% Params, 17.18 GMACs, 0.29% MACs, 3.98 ms, 0.30% latency, 8.66 TFLOPS, 
+                (dense): Linear(1.05 M, 0.31% Params, 17.18 GMACs, 0.29% MACs, 2.86 ms, 0.22% latency, 12.02 TFLOPS, in_features=1024, out_features=1024, bias=True)
+                (LayerNorm): LayerNorm(2.05 k, 0.00% Params, 0 MACs, 0.00% MACs, 381.57 us, 0.03% latency, 219.85 GFLOPS, (1024,), eps=1e-12, elementwise_affine=True)
+                (dropout): Dropout(0, 0.00% Params, 0 MACs, 0.00% MACs, 45.6 us, 0.00% latency, 0.0 FLOPS, p=0.1, inplace=False)
+              )
+            )
+            (intermediate): BertIntermediate(
+              4.2 M, 1.25% Params, 68.72 GMACs, 1.17% MACs, 11.98 ms, 0.91% latency, 11.47 TFLOPS, 
+              (dense): Linear(4.2 M, 1.25% Params, 68.72 GMACs, 1.17% MACs, 10.66 ms, 0.81% latency, 12.89 TFLOPS, in_features=1024, out_features=4096, bias=True)
+              (intermediate_act_fn): GELUActivation(0, 0.00% Params, 0 MACs, 0.00% MACs, 1.13 ms, 0.09% latency, 0.0 FLOPS, )
+            )
+            (output): BertOutput(
+              4.2 M, 1.25% Params, 68.72 GMACs, 1.17% MACs, 11.82 ms, 0.89% latency, 11.63 TFLOPS, 
+              (dense): Linear(4.2 M, 1.25% Params, 68.72 GMACs, 1.17% MACs, 10.7 ms, 0.81% latency, 12.84 TFLOPS, in_features=4096, out_features=1024, bias=True)
+              (LayerNorm): LayerNorm(2.05 k, 0.00% Params, 0 MACs, 0.00% MACs, 375.33 us, 0.03% latency, 223.5 GFLOPS, (1024,), eps=1e-12, elementwise_affine=True)
+              (dropout): Dropout(0, 0.00% Params, 0 MACs, 0.00% MACs, 47.2 us, 0.00% latency, 0.0 FLOPS, p=0.1, inplace=False)
+            )
+          )
+        )
+        (7): ModelShard(
+          12.6 M, 3.76% Params, 223.34 GMACs, 3.79% MACs, 46.78 ms, 3.54% latency, 9.56 TFLOPS, 
+          (model_shard): BertLayer(
+            12.6 M, 3.76% Params, 223.34 GMACs, 3.79% MACs, 46.66 ms, 3.53% latency, 9.58 TFLOPS, 
+            (attention): BertAttention(
+              4.2 M, 1.25% Params, 85.9 GMACs, 1.46% MACs, 23.08 ms, 1.75% latency, 7.45 TFLOPS, 
+              (self): BertSelfAttention(
+                3.15 M, 0.94% Params, 68.72 GMACs, 1.17% MACs, 18.97 ms, 1.44% latency, 7.25 TFLOPS, 
+                (query): Linear(1.05 M, 0.31% Params, 17.18 GMACs, 0.29% MACs, 2.91 ms, 0.22% latency, 11.79 TFLOPS, in_features=1024, out_features=1024, bias=True)
+                (key): Linear(1.05 M, 0.31% Params, 17.18 GMACs, 0.29% MACs, 2.82 ms, 0.21% latency, 12.2 TFLOPS, in_features=1024, out_features=1024, bias=True)
+                (value): Linear(1.05 M, 0.31% Params, 17.18 GMACs, 0.29% MACs, 2.78 ms, 0.21% latency, 12.36 TFLOPS, in_features=1024, out_features=1024, bias=True)
+                (dropout): Dropout(0, 0.00% Params, 0 MACs, 0.00% MACs, 1.89 us, 0.00% latency, 0.0 FLOPS, p=0.1, inplace=False)
+              )
+              (output): BertSelfOutput(
+                1.05 M, 0.31% Params, 17.18 GMACs, 0.29% MACs, 3.9 ms, 0.30% latency, 8.82 TFLOPS, 
+                (dense): Linear(1.05 M, 0.31% Params, 17.18 GMACs, 0.29% MACs, 2.8 ms, 0.21% latency, 12.27 TFLOPS, in_features=1024, out_features=1024, bias=True)
+                (LayerNorm): LayerNorm(2.05 k, 0.00% Params, 0 MACs, 0.00% MACs, 371.9 us, 0.03% latency, 225.56 GFLOPS, (1024,), eps=1e-12, elementwise_affine=True)
+                (dropout): Dropout(0, 0.00% Params, 0 MACs, 0.00% MACs, 49.06 us, 0.00% latency, 0.0 FLOPS, p=0.1, inplace=False)
+              )
+            )
+            (intermediate): BertIntermediate(
+              4.2 M, 1.25% Params, 68.72 GMACs, 1.17% MACs, 11.74 ms, 0.89% latency, 11.71 TFLOPS, 
+              (dense): Linear(4.2 M, 1.25% Params, 68.72 GMACs, 1.17% MACs, 10.43 ms, 0.79% latency, 13.18 TFLOPS, in_features=1024, out_features=4096, bias=True)
+              (intermediate_act_fn): GELUActivation(0, 0.00% Params, 0 MACs, 0.00% MACs, 1.13 ms, 0.09% latency, 0.0 FLOPS, )
+            )
+            (output): BertOutput(
+              4.2 M, 1.25% Params, 68.72 GMACs, 1.17% MACs, 11.48 ms, 0.87% latency, 11.98 TFLOPS, 
+              (dense): Linear(4.2 M, 1.25% Params, 68.72 GMACs, 1.17% MACs, 10.39 ms, 0.79% latency, 13.22 TFLOPS, in_features=4096, out_features=1024, bias=True)
+              (LayerNorm): LayerNorm(2.05 k, 0.00% Params, 0 MACs, 0.00% MACs, 367.1 us, 0.03% latency, 228.51 GFLOPS, (1024,), eps=1e-12, elementwise_affine=True)
+              (dropout): Dropout(0, 0.00% Params, 0 MACs, 0.00% MACs, 45.02 us, 0.00% latency, 0.0 FLOPS, p=0.1, inplace=False)
+            )
+          )
+        )
+        (8): ModelShard(
+          12.6 M, 3.76% Params, 223.34 GMACs, 3.79% MACs, 47.89 ms, 3.62% latency, 9.33 TFLOPS, 
+          (model_shard): BertLayer(
+            12.6 M, 3.76% Params, 223.34 GMACs, 3.79% MACs, 47.77 ms, 3.61% latency, 9.36 TFLOPS, 
+            (attention): BertAttention(
+              4.2 M, 1.25% Params, 85.9 GMACs, 1.46% MACs, 23.53 ms, 1.78% latency, 7.31 TFLOPS, 
+              (self): BertSelfAttention(
+                3.15 M, 0.94% Params, 68.72 GMACs, 1.17% MACs, 19.33 ms, 1.46% latency, 7.12 TFLOPS, 
+                (query): Linear(1.05 M, 0.31% Params, 17.18 GMACs, 0.29% MACs, 2.94 ms, 0.22% latency, 11.7 TFLOPS, in_features=1024, out_features=1024, bias=True)
+                (key): Linear(1.05 M, 0.31% Params, 17.18 GMACs, 0.29% MACs, 2.92 ms, 0.22% latency, 11.78 TFLOPS, in_features=1024, out_features=1024, bias=True)
+                (value): Linear(1.05 M, 0.31% Params, 17.18 GMACs, 0.29% MACs, 2.92 ms, 0.22% latency, 11.76 TFLOPS, in_features=1024, out_features=1024, bias=True)
+                (dropout): Dropout(0, 0.00% Params, 0 MACs, 0.00% MACs, 1.89 us, 0.00% latency, 0.0 FLOPS, p=0.1, inplace=False)
+              )
+              (output): BertSelfOutput(
+                1.05 M, 0.31% Params, 17.18 GMACs, 0.29% MACs, 3.99 ms, 0.30% latency, 8.63 TFLOPS, 
+                (dense): Linear(1.05 M, 0.31% Params, 17.18 GMACs, 0.29% MACs, 2.89 ms, 0.22% latency, 11.87 TFLOPS, in_features=1024, out_features=1024, bias=True)
+                (LayerNorm): LayerNorm(2.05 k, 0.00% Params, 0 MACs, 0.00% MACs, 374.75 us, 0.03% latency, 223.84 GFLOPS, (1024,), eps=1e-12, elementwise_affine=True)
+                (dropout): Dropout(0, 0.00% Params, 0 MACs, 0.00% MACs, 44.13 us, 0.00% latency, 0.0 FLOPS, p=0.1, inplace=False)
+              )
+            )
+            (intermediate): BertIntermediate(
+              4.2 M, 1.25% Params, 68.72 GMACs, 1.17% MACs, 12.06 ms, 0.91% latency, 11.39 TFLOPS, 
+              (dense): Linear(4.2 M, 1.25% Params, 68.72 GMACs, 1.17% MACs, 10.75 ms, 0.81% latency, 12.79 TFLOPS, in_features=1024, out_features=4096, bias=True)
+              (intermediate_act_fn): GELUActivation(0, 0.00% Params, 0 MACs, 0.00% MACs, 1.13 ms, 0.09% latency, 0.0 FLOPS, )
+            )
+            (output): BertOutput(
+              4.2 M, 1.25% Params, 68.72 GMACs, 1.17% MACs, 11.82 ms, 0.89% latency, 11.63 TFLOPS, 
+              (dense): Linear(4.2 M, 1.25% Params, 68.72 GMACs, 1.17% MACs, 10.71 ms, 0.81% latency, 12.83 TFLOPS, in_features=4096, out_features=1024, bias=True)
+              (LayerNorm): LayerNorm(2.05 k, 0.00% Params, 0 MACs, 0.00% MACs, 375.55 us, 0.03% latency, 223.37 GFLOPS, (1024,), eps=1e-12, elementwise_affine=True)
+              (dropout): Dropout(0, 0.00% Params, 0 MACs, 0.00% MACs, 46.78 us, 0.00% latency, 0.0 FLOPS, p=0.1, inplace=False)
+            )
+          )
+        )
+        (9): ModelShard(
+          12.6 M, 3.76% Params, 223.34 GMACs, 3.79% MACs, 47.19 ms, 3.57% latency, 9.47 TFLOPS, 
+          (model_shard): BertLayer(
+            12.6 M, 3.76% Params, 223.34 GMACs, 3.79% MACs, 47.07 ms, 3.56% latency, 9.5 TFLOPS, 
+            (attention): BertAttention(
+              4.2 M, 1.25% Params, 85.9 GMACs, 1.46% MACs, 23.36 ms, 1.77% latency, 7.36 TFLOPS, 
+              (self): BertSelfAttention(
+                3.15 M, 0.94% Params, 68.72 GMACs, 1.17% MACs, 19.16 ms, 1.45% latency, 7.18 TFLOPS, 
+                (query): Linear(1.05 M, 0.31% Params, 17.18 GMACs, 0.29% MACs, 2.91 ms, 0.22% latency, 11.81 TFLOPS, in_features=1024, out_features=1024, bias=True)
+                (key): Linear(1.05 M, 0.31% Params, 17.18 GMACs, 0.29% MACs, 2.85 ms, 0.22% latency, 12.07 TFLOPS, in_features=1024, out_features=1024, bias=True)
+                (value): Linear(1.05 M, 0.31% Params, 17.18 GMACs, 0.29% MACs, 2.84 ms, 0.22% latency, 12.08 TFLOPS, in_features=1024, out_features=1024, bias=True)
+                (dropout): Dropout(0, 0.00% Params, 0 MACs, 0.00% MACs, 1.89 us, 0.00% latency, 0.0 FLOPS, p=0.1, inplace=False)
+              )
+              (output): BertSelfOutput(
+                1.05 M, 0.31% Params, 17.18 GMACs, 0.29% MACs, 3.99 ms, 0.30% latency, 8.63 TFLOPS, 
+                (dense): Linear(1.05 M, 0.31% Params, 17.18 GMACs, 0.29% MACs, 2.86 ms, 0.22% latency, 12.02 TFLOPS, in_features=1024, out_features=1024, bias=True)
+                (LayerNorm): LayerNorm(2.05 k, 0.00% Params, 0 MACs, 0.00% MACs, 380.1 us, 0.03% latency, 220.7 GFLOPS, (1024,), eps=1e-12, elementwise_affine=True)
+                (dropout): Dropout(0, 0.00% Params, 0 MACs, 0.00% MACs, 48.35 us, 0.00% latency, 0.0 FLOPS, p=0.1, inplace=False)
+              )
+            )
+            (intermediate): BertIntermediate(
+              4.2 M, 1.25% Params, 68.72 GMACs, 1.17% MACs, 11.79 ms, 0.89% latency, 11.66 TFLOPS, 
+              (dense): Linear(4.2 M, 1.25% Params, 68.72 GMACs, 1.17% MACs, 10.46 ms, 0.79% latency, 13.14 TFLOPS, in_features=1024, out_features=4096, bias=True)
+              (intermediate_act_fn): GELUActivation(0, 0.00% Params, 0 MACs, 0.00% MACs, 1.13 ms, 0.09% latency, 0.0 FLOPS, )
+            )
+            (output): BertOutput(
+              4.2 M, 1.25% Params, 68.72 GMACs, 1.17% MACs, 11.58 ms, 0.88% latency, 11.87 TFLOPS, 
+              (dense): Linear(4.2 M, 1.25% Params, 68.72 GMACs, 1.17% MACs, 10.46 ms, 0.79% latency, 13.14 TFLOPS, in_features=4096, out_features=1024, bias=True)
+              (LayerNorm): LayerNorm(2.05 k, 0.00% Params, 0 MACs, 0.00% MACs, 366.78 us, 0.03% latency, 228.71 GFLOPS, (1024,), eps=1e-12, elementwise_affine=True)
+              (dropout): Dropout(0, 0.00% Params, 0 MACs, 0.00% MACs, 51.97 us, 0.00% latency, 0.0 FLOPS, p=0.1, inplace=False)
+            )
+          )
+        )
+        (10): ModelShard(
+          12.6 M, 3.76% Params, 223.34 GMACs, 3.79% MACs, 47.24 ms, 3.57% latency, 9.46 TFLOPS, 
+          (model_shard): BertLayer(
+            12.6 M, 3.76% Params, 223.34 GMACs, 3.79% MACs, 47.12 ms, 3.56% latency, 9.49 TFLOPS, 
+            (attention): BertAttention(
+              4.2 M, 1.25% Params, 85.9 GMACs, 1.46% MACs, 23.76 ms, 1.80% latency, 7.24 TFLOPS, 
+              (self): BertSelfAttention(
+                3.15 M, 0.94% Params, 68.72 GMACs, 1.17% MACs, 19.62 ms, 1.48% latency, 7.01 TFLOPS, 
+                (query): Linear(1.05 M, 0.31% Params, 17.18 GMACs, 0.29% MACs, 3.43 ms, 0.26% latency, 10.02 TFLOPS, in_features=1024, out_features=1024, bias=True)
+                (key): Linear(1.05 M, 0.31% Params, 17.18 GMACs, 0.29% MACs, 2.88 ms, 0.22% latency, 11.95 TFLOPS, in_features=1024, out_features=1024, bias=True)
+                (value): Linear(1.05 M, 0.31% Params, 17.18 GMACs, 0.29% MACs, 2.85 ms, 0.22% latency, 12.04 TFLOPS, in_features=1024, out_features=1024, bias=True)
+                (dropout): Dropout(0, 0.00% Params, 0 MACs, 0.00% MACs, 1.89 us, 0.00% latency, 0.0 FLOPS, p=0.1, inplace=False)
+              )
+              (output): BertSelfOutput(
+                1.05 M, 0.31% Params, 17.18 GMACs, 0.29% MACs, 3.91 ms, 0.30% latency, 8.82 TFLOPS, 
+                (dense): Linear(1.05 M, 0.31% Params, 17.18 GMACs, 0.29% MACs, 2.78 ms, 0.21% latency, 12.34 TFLOPS, in_features=1024, out_features=1024, bias=True)
+                (LayerNorm): LayerNorm(2.05 k, 0.00% Params, 0 MACs, 0.00% MACs, 372.58 us, 0.03% latency, 225.15 GFLOPS, (1024,), eps=1e-12, elementwise_affine=True)
+                (dropout): Dropout(0, 0.00% Params, 0 MACs, 0.00% MACs, 46.91 us, 0.00% latency, 0.0 FLOPS, p=0.1, inplace=False)
+              )
+            )
+            (intermediate): BertIntermediate(
+              4.2 M, 1.25% Params, 68.72 GMACs, 1.17% MACs, 11.65 ms, 0.88% latency, 11.79 TFLOPS, 
+              (dense): Linear(4.2 M, 1.25% Params, 68.72 GMACs, 1.17% MACs, 10.27 ms, 0.78% latency, 13.38 TFLOPS, in_features=1024, out_features=4096, bias=True)
+              (intermediate_act_fn): GELUActivation(0, 0.00% Params, 0 MACs, 0.00% MACs, 1.14 ms, 0.09% latency, 0.0 FLOPS, )
+            )
+            (output): BertOutput(
+              4.2 M, 1.25% Params, 68.72 GMACs, 1.17% MACs, 11.36 ms, 0.86% latency, 12.1 TFLOPS, 
+              (dense): Linear(4.2 M, 1.25% Params, 68.72 GMACs, 1.17% MACs, 10.24 ms, 0.77% latency, 13.42 TFLOPS, in_features=4096, out_features=1024, bias=True)
+              (LayerNorm): LayerNorm(2.05 k, 0.00% Params, 0 MACs, 0.00% MACs, 367.14 us, 0.03% latency, 228.49 GFLOPS, (1024,), eps=1e-12, elementwise_affine=True)
+              (dropout): Dropout(0, 0.00% Params, 0 MACs, 0.00% MACs, 46.85 us, 0.00% latency, 0.0 FLOPS, p=0.1, inplace=False)
+            )
+          )
+        )
+        (11): ModelShard(
+          12.6 M, 3.76% Params, 223.34 GMACs, 3.79% MACs, 47.53 ms, 3.60% latency, 9.4 TFLOPS, 
+          (model_shard): BertLayer(
+            12.6 M, 3.76% Params, 223.34 GMACs, 3.79% MACs, 47.39 ms, 3.59% latency, 9.43 TFLOPS, 
+            (attention): BertAttention(
+              4.2 M, 1.25% Params, 85.9 GMACs, 1.46% MACs, 23.64 ms, 1.79% latency, 7.28 TFLOPS, 
+              (self): BertSelfAttention(
+                3.15 M, 0.94% Params, 68.72 GMACs, 1.17% MACs, 19.42 ms, 1.47% latency, 7.08 TFLOPS, 
+                (query): Linear(1.05 M, 0.31% Params, 17.18 GMACs, 0.29% MACs, 2.96 ms, 0.22% latency, 11.59 TFLOPS, in_features=1024, out_features=1024, bias=True)
+                (key): Linear(1.05 M, 0.31% Params, 17.18 GMACs, 0.29% MACs, 2.92 ms, 0.22% latency, 11.75 TFLOPS, in_features=1024, out_features=1024, bias=True)
+                (value): Linear(1.05 M, 0.31% Params, 17.18 GMACs, 0.29% MACs, 2.91 ms, 0.22% latency, 11.79 TFLOPS, in_features=1024, out_features=1024, bias=True)
+                (dropout): Dropout(0, 0.00% Params, 0 MACs, 0.00% MACs, 1.92 us, 0.00% latency, 0.0 FLOPS, p=0.1, inplace=False)
+              )
+              (output): BertSelfOutput(
+                1.05 M, 0.31% Params, 17.18 GMACs, 0.29% MACs, 3.99 ms, 0.30% latency, 8.63 TFLOPS, 
+                (dense): Linear(1.05 M, 0.31% Params, 17.18 GMACs, 0.29% MACs, 2.88 ms, 0.22% latency, 11.92 TFLOPS, in_features=1024, out_features=1024, bias=True)
+                (LayerNorm): LayerNorm(2.05 k, 0.00% Params, 0 MACs, 0.00% MACs, 372.32 us, 0.03% latency, 225.31 GFLOPS, (1024,), eps=1e-12, elementwise_affine=True)
+                (dropout): Dropout(0, 0.00% Params, 0 MACs, 0.00% MACs, 45.09 us, 0.00% latency, 0.0 FLOPS, p=0.1, inplace=False)
+              )
+            )
+            (intermediate): BertIntermediate(
+              4.2 M, 1.25% Params, 68.72 GMACs, 1.17% MACs, 11.7 ms, 0.88% latency, 11.75 TFLOPS, 
+              (dense): Linear(4.2 M, 1.25% Params, 68.72 GMACs, 1.17% MACs, 10.37 ms, 0.78% latency, 13.26 TFLOPS, in_features=1024, out_features=4096, bias=True)
+              (intermediate_act_fn): GELUActivation(0, 0.00% Params, 0 MACs, 0.00% MACs, 1.14 ms, 0.09% latency, 0.0 FLOPS, )
+            )
+            (output): BertOutput(
+              4.2 M, 1.25% Params, 68.72 GMACs, 1.17% MACs, 11.66 ms, 0.88% latency, 11.79 TFLOPS, 
+              (dense): Linear(4.2 M, 1.25% Params, 68.72 GMACs, 1.17% MACs, 10.45 ms, 0.79% latency, 13.15 TFLOPS, in_features=4096, out_features=1024, bias=True)
+              (LayerNorm): LayerNorm(2.05 k, 0.00% Params, 0 MACs, 0.00% MACs, 363.55 us, 0.03% latency, 230.74 GFLOPS, (1024,), eps=1e-12, elementwise_affine=True)
+              (dropout): Dropout(0, 0.00% Params, 0 MACs, 0.00% MACs, 67.01 us, 0.01% latency, 0.0 FLOPS, p=0.1, inplace=False)
+            )
+          )
+        )
+        (12): ModelShard(
+          12.6 M, 3.76% Params, 223.34 GMACs, 3.79% MACs, 47.03 ms, 3.56% latency, 9.5 TFLOPS, 
+          (model_shard): BertLayer(
+            12.6 M, 3.76% Params, 223.34 GMACs, 3.79% MACs, 46.91 ms, 3.55% latency, 9.53 TFLOPS, 
+            (attention): BertAttention(
+              4.2 M, 1.25% Params, 85.9 GMACs, 1.46% MACs, 23.29 ms, 1.76% latency, 7.39 TFLOPS, 
+              (self): BertSelfAttention(
+                3.15 M, 0.94% Params, 68.72 GMACs, 1.17% MACs, 19.17 ms, 1.45% latency, 7.18 TFLOPS, 
+                (query): Linear(1.05 M, 0.31% Params, 17.18 GMACs, 0.29% MACs, 2.92 ms, 0.22% latency, 11.77 TFLOPS, in_features=1024, out_features=1024, bias=True)
+                (key): Linear(1.05 M, 0.31% Params, 17.18 GMACs, 0.29% MACs, 2.87 ms, 0.22% latency, 11.98 TFLOPS, in_features=1024, out_features=1024, bias=True)
+                (value): Linear(1.05 M, 0.31% Params, 17.18 GMACs, 0.29% MACs, 2.85 ms, 0.22% latency, 12.06 TFLOPS, in_features=1024, out_features=1024, bias=True)
+                (dropout): Dropout(0, 0.00% Params, 0 MACs, 0.00% MACs, 1.89 us, 0.00% latency, 0.0 FLOPS, p=0.1, inplace=False)
+              )
+              (output): BertSelfOutput(
+                1.05 M, 0.31% Params, 17.18 GMACs, 0.29% MACs, 3.92 ms, 0.30% latency, 8.78 TFLOPS, 
+                (dense): Linear(1.05 M, 0.31% Params, 17.18 GMACs, 0.29% MACs, 2.81 ms, 0.21% latency, 12.24 TFLOPS, in_features=1024, out_features=1024, bias=True)
+                (LayerNorm): LayerNorm(2.05 k, 0.00% Params, 0 MACs, 0.00% MACs, 378.21 us, 0.03% latency, 221.8 GFLOPS, (1024,), eps=1e-12, elementwise_affine=True)
+                (dropout): Dropout(0, 0.00% Params, 0 MACs, 0.00% MACs, 49.12 us, 0.00% latency, 0.0 FLOPS, p=0.1, inplace=False)
+              )
+            )
+            (intermediate): BertIntermediate(
+              4.2 M, 1.25% Params, 68.72 GMACs, 1.17% MACs, 11.77 ms, 0.89% latency, 11.68 TFLOPS, 
+              (dense): Linear(4.2 M, 1.25% Params, 68.72 GMACs, 1.17% MACs, 10.44 ms, 0.79% latency, 13.17 TFLOPS, in_features=1024, out_features=4096, bias=True)
+              (intermediate_act_fn): GELUActivation(0, 0.00% Params, 0 MACs, 0.00% MACs, 1.14 ms, 0.09% latency, 0.0 FLOPS, )
+            )
+            (output): BertOutput(
+              4.2 M, 1.25% Params, 68.72 GMACs, 1.17% MACs, 11.48 ms, 0.87% latency, 11.98 TFLOPS, 
+              (dense): Linear(4.2 M, 1.25% Params, 68.72 GMACs, 1.17% MACs, 10.33 ms, 0.78% latency, 13.3 TFLOPS, in_features=4096, out_features=1024, bias=True)
+              (LayerNorm): LayerNorm(2.05 k, 0.00% Params, 0 MACs, 0.00% MACs, 374.24 us, 0.03% latency, 224.15 GFLOPS, (1024,), eps=1e-12, elementwise_affine=True)
+              (dropout): Dropout(0, 0.00% Params, 0 MACs, 0.00% MACs, 79.94 us, 0.01% latency, 0.0 FLOPS, p=0.1, inplace=False)
+            )
+          )
+        )
+        (13): ModelShard(
+          12.6 M, 3.76% Params, 223.34 GMACs, 3.79% MACs, 48.47 ms, 3.67% latency, 9.22 TFLOPS, 
+          (model_shard): BertLayer(
+            12.6 M, 3.76% Params, 223.34 GMACs, 3.79% MACs, 48.35 ms, 3.66% latency, 9.25 TFLOPS, 
+            (attention): BertAttention(
+              4.2 M, 1.25% Params, 85.9 GMACs, 1.46% MACs, 24.0 ms, 1.82% latency, 7.17 TFLOPS, 
+              (self): BertSelfAttention(
+                3.15 M, 0.94% Params, 68.72 GMACs, 1.17% MACs, 19.75 ms, 1.49% latency, 6.97 TFLOPS, 
+                (query): Linear(1.05 M, 0.31% Params, 17.18 GMACs, 0.29% MACs, 3.01 ms, 0.23% latency, 11.42 TFLOPS, in_features=1024, out_features=1024, bias=True)
+                (key): Linear(1.05 M, 0.31% Params, 17.18 GMACs, 0.29% MACs, 2.99 ms, 0.23% latency, 11.49 TFLOPS, in_features=1024, out_features=1024, bias=True)
+                (value): Linear(1.05 M, 0.31% Params, 17.18 GMACs, 0.29% MACs, 3.0 ms, 0.23% latency, 11.47 TFLOPS, in_features=1024, out_features=1024, bias=True)
+                (dropout): Dropout(0, 0.00% Params, 0 MACs, 0.00% MACs, 1.89 us, 0.00% latency, 0.0 FLOPS, p=0.1, inplace=False)
+              )
+              (output): BertSelfOutput(
+                1.05 M, 0.31% Params, 17.18 GMACs, 0.29% MACs, 4.05 ms, 0.31% latency, 8.51 TFLOPS, 
+                (dense): Linear(1.05 M, 0.31% Params, 17.18 GMACs, 0.29% MACs, 2.91 ms, 0.22% latency, 11.79 TFLOPS, in_features=1024, out_features=1024, bias=True)
+                (LayerNorm): LayerNorm(2.05 k, 0.00% Params, 0 MACs, 0.00% MACs, 372.22 us, 0.03% latency, 225.36 GFLOPS, (1024,), eps=1e-12, elementwise_affine=True)
+                (dropout): Dropout(0, 0.00% Params, 0 MACs, 0.00% MACs, 45.73 us, 0.00% latency, 0.0 FLOPS, p=0.1, inplace=False)
+              )
+            )
+            (intermediate): BertIntermediate(
+              4.2 M, 1.25% Params, 68.72 GMACs, 1.17% MACs, 12.08 ms, 0.91% latency, 11.38 TFLOPS, 
+              (dense): Linear(4.2 M, 1.25% Params, 68.72 GMACs, 1.17% MACs, 10.75 ms, 0.81% latency, 12.78 TFLOPS, in_features=1024, out_features=4096, bias=True)
+              (intermediate_act_fn): GELUActivation(0, 0.00% Params, 0 MACs, 0.00% MACs, 1.14 ms, 0.09% latency, 0.0 FLOPS, )
+            )
+            (output): BertOutput(
+              4.2 M, 1.25% Params, 68.72 GMACs, 1.17% MACs, 11.9 ms, 0.90% latency, 11.55 TFLOPS, 
+              (dense): Linear(4.2 M, 1.25% Params, 68.72 GMACs, 1.17% MACs, 10.8 ms, 0.82% latency, 12.72 TFLOPS, in_features=4096, out_features=1024, bias=True)
+              (LayerNorm): LayerNorm(2.05 k, 0.00% Params, 0 MACs, 0.00% MACs, 363.01 us, 0.03% latency, 231.09 GFLOPS, (1024,), eps=1e-12, elementwise_affine=True)
+              (dropout): Dropout(0, 0.00% Params, 0 MACs, 0.00% MACs, 47.14 us, 0.00% latency, 0.0 FLOPS, p=0.1, inplace=False)
+            )
+          )
+        )
+        (14): ModelShard(
+          12.6 M, 3.76% Params, 223.34 GMACs, 3.79% MACs, 46.86 ms, 3.55% latency, 9.54 TFLOPS, 
+          (model_shard): BertLayer(
+            12.6 M, 3.76% Params, 223.34 GMACs, 3.79% MACs, 46.74 ms, 3.54% latency, 9.56 TFLOPS, 
+            (attention): BertAttention(
+              4.2 M, 1.25% Params, 85.9 GMACs, 1.46% MACs, 23.35 ms, 1.77% latency, 7.37 TFLOPS, 
+              (self): BertSelfAttention(
+                3.15 M, 0.94% Params, 68.72 GMACs, 1.17% MACs, 19.24 ms, 1.46% latency, 7.15 TFLOPS, 
+                (query): Linear(1.05 M, 0.31% Params, 17.18 GMACs, 0.29% MACs, 2.95 ms, 0.22% latency, 11.66 TFLOPS, in_features=1024, out_features=1024, bias=True)
+                (key): Linear(1.05 M, 0.31% Params, 17.18 GMACs, 0.29% MACs, 2.93 ms, 0.22% latency, 11.74 TFLOPS, in_features=1024, out_features=1024, bias=True)
+                (value): Linear(1.05 M, 0.31% Params, 17.18 GMACs, 0.29% MACs, 2.9 ms, 0.22% latency, 11.85 TFLOPS, in_features=1024, out_features=1024, bias=True)
+                (dropout): Dropout(0, 0.00% Params, 0 MACs, 0.00% MACs, 1.92 us, 0.00% latency, 0.0 FLOPS, p=0.1, inplace=False)
+              )
+              (output): BertSelfOutput(
+                1.05 M, 0.31% Params, 17.18 GMACs, 0.29% MACs, 3.91 ms, 0.30% latency, 8.82 TFLOPS, 
+                (dense): Linear(1.05 M, 0.31% Params, 17.18 GMACs, 0.29% MACs, 2.79 ms, 0.21% latency, 12.3 TFLOPS, in_features=1024, out_features=1024, bias=True)
+                (LayerNorm): LayerNorm(2.05 k, 0.00% Params, 0 MACs, 0.00% MACs, 372.06 us, 0.03% latency, 225.46 GFLOPS, (1024,), eps=1e-12, elementwise_affine=True)
+                (dropout): Dropout(0, 0.00% Params, 0 MACs, 0.00% MACs, 44.38 us, 0.00% latency, 0.0 FLOPS, p=0.1, inplace=False)
+              )
+            )
+            (intermediate): BertIntermediate(
+              4.2 M, 1.25% Params, 68.72 GMACs, 1.17% MACs, 11.72 ms, 0.89% latency, 11.73 TFLOPS, 
+              (dense): Linear(4.2 M, 1.25% Params, 68.72 GMACs, 1.17% MACs, 10.37 ms, 0.78% latency, 13.26 TFLOPS, in_features=1024, out_features=4096, bias=True)
+              (intermediate_act_fn): GELUActivation(0, 0.00% Params, 0 MACs, 0.00% MACs, 1.14 ms, 0.09% latency, 0.0 FLOPS, )
+            )
+            (output): BertOutput(
+              4.2 M, 1.25% Params, 68.72 GMACs, 1.17% MACs, 11.32 ms, 0.86% latency, 12.15 TFLOPS, 
+              (dense): Linear(4.2 M, 1.25% Params, 68.72 GMACs, 1.17% MACs, 10.2 ms, 0.77% latency, 13.47 TFLOPS, in_features=4096, out_features=1024, bias=True)
+              (LayerNorm): LayerNorm(2.05 k, 0.00% Params, 0 MACs, 0.00% MACs, 372.7 us, 0.03% latency, 225.07 GFLOPS, (1024,), eps=1e-12, elementwise_affine=True)
+              (dropout): Dropout(0, 0.00% Params, 0 MACs, 0.00% MACs, 47.1 us, 0.00% latency, 0.0 FLOPS, p=0.1, inplace=False)
+            )
+          )
+        )
+        (15): ModelShard(
+          12.6 M, 3.76% Params, 223.34 GMACs, 3.79% MACs, 48.0 ms, 3.63% latency, 9.31 TFLOPS, 
+          (model_shard): BertLayer(
+            12.6 M, 3.76% Params, 223.34 GMACs, 3.79% MACs, 47.88 ms, 3.62% latency, 9.33 TFLOPS, 
+            (attention): BertAttention(
+              4.2 M, 1.25% Params, 85.9 GMACs, 1.46% MACs, 23.62 ms, 1.79% latency, 7.28 TFLOPS, 
+              (self): BertSelfAttention(
+                3.15 M, 0.94% Params, 68.72 GMACs, 1.17% MACs, 19.44 ms, 1.47% latency, 7.08 TFLOPS, 
+                (query): Linear(1.05 M, 0.31% Params, 17.18 GMACs, 0.29% MACs, 2.95 ms, 0.22% latency, 11.67 TFLOPS, in_features=1024, out_features=1024, bias=True)
+                (key): Linear(1.05 M, 0.31% Params, 17.18 GMACs, 0.29% MACs, 2.93 ms, 0.22% latency, 11.73 TFLOPS, in_features=1024, out_features=1024, bias=True)
+                (value): Linear(1.05 M, 0.31% Params, 17.18 GMACs, 0.29% MACs, 2.92 ms, 0.22% latency, 11.75 TFLOPS, in_features=1024, out_features=1024, bias=True)
+                (dropout): Dropout(0, 0.00% Params, 0 MACs, 0.00% MACs, 1.92 us, 0.00% latency, 0.0 FLOPS, p=0.1, inplace=False)
+              )
+              (output): BertSelfOutput(
+                1.05 M, 0.31% Params, 17.18 GMACs, 0.29% MACs, 3.98 ms, 0.30% latency, 8.65 TFLOPS, 
+                (dense): Linear(1.05 M, 0.31% Params, 17.18 GMACs, 0.29% MACs, 2.87 ms, 0.22% latency, 11.99 TFLOPS, in_features=1024, out_features=1024, bias=True)
+                (LayerNorm): LayerNorm(2.05 k, 0.00% Params, 0 MACs, 0.00% MACs, 374.75 us, 0.03% latency, 223.84 GFLOPS, (1024,), eps=1e-12, elementwise_affine=True)
+                (dropout): Dropout(0, 0.00% Params, 0 MACs, 0.00% MACs, 44.99 us, 0.00% latency, 0.0 FLOPS, p=0.1, inplace=False)
+              )
+            )
+            (intermediate): BertIntermediate(
+              4.2 M, 1.25% Params, 68.72 GMACs, 1.17% MACs, 12.01 ms, 0.91% latency, 11.45 TFLOPS, 
+              (dense): Linear(4.2 M, 1.25% Params, 68.72 GMACs, 1.17% MACs, 10.68 ms, 0.81% latency, 12.87 TFLOPS, in_features=1024, out_features=4096, bias=True)
+              (intermediate_act_fn): GELUActivation(0, 0.00% Params, 0 MACs, 0.00% MACs, 1.13 ms, 0.09% latency, 0.0 FLOPS, )
+            )
+            (output): BertOutput(
+              4.2 M, 1.25% Params, 68.72 GMACs, 1.17% MACs, 11.88 ms, 0.90% latency, 11.58 TFLOPS, 
+              (dense): Linear(4.2 M, 1.25% Params, 68.72 GMACs, 1.17% MACs, 10.76 ms, 0.81% latency, 12.77 TFLOPS, in_features=4096, out_features=1024, bias=True)
+              (LayerNorm): LayerNorm(2.05 k, 0.00% Params, 0 MACs, 0.00% MACs, 367.42 us, 0.03% latency, 228.31 GFLOPS, (1024,), eps=1e-12, elementwise_affine=True)
+              (dropout): Dropout(0, 0.00% Params, 0 MACs, 0.00% MACs, 44.86 us, 0.00% latency, 0.0 FLOPS, p=0.1, inplace=False)
+            )
+          )
+        )
+        (16): ModelShard(
+          12.6 M, 3.76% Params, 223.34 GMACs, 3.79% MACs, 46.91 ms, 3.55% latency, 9.53 TFLOPS, 
+          (model_shard): BertLayer(
+            12.6 M, 3.76% Params, 223.34 GMACs, 3.79% MACs, 46.79 ms, 3.54% latency, 9.55 TFLOPS, 
+            (attention): BertAttention(
+              4.2 M, 1.25% Params, 85.9 GMACs, 1.46% MACs, 23.26 ms, 1.76% latency, 7.4 TFLOPS, 
+              (self): BertSelfAttention(
+                3.15 M, 0.94% Params, 68.72 GMACs, 1.17% MACs, 19.17 ms, 1.45% latency, 7.18 TFLOPS, 
+                (query): Linear(1.05 M, 0.31% Params, 17.18 GMACs, 0.29% MACs, 2.93 ms, 0.22% latency, 11.72 TFLOPS, in_features=1024, out_features=1024, bias=True)
+                (key): Linear(1.05 M, 0.31% Params, 17.18 GMACs, 0.29% MACs, 2.92 ms, 0.22% latency, 11.77 TFLOPS, in_features=1024, out_features=1024, bias=True)
+                (value): Linear(1.05 M, 0.31% Params, 17.18 GMACs, 0.29% MACs, 2.84 ms, 0.22% latency, 12.08 TFLOPS, in_features=1024, out_features=1024, bias=True)
+                (dropout): Dropout(0, 0.00% Params, 0 MACs, 0.00% MACs, 1.92 us, 0.00% latency, 0.0 FLOPS, p=0.1, inplace=False)
+              )
+              (output): BertSelfOutput(
+                1.05 M, 0.31% Params, 17.18 GMACs, 0.29% MACs, 3.89 ms, 0.29% latency, 8.85 TFLOPS, 
+                (dense): Linear(1.05 M, 0.31% Params, 17.18 GMACs, 0.29% MACs, 2.79 ms, 0.21% latency, 12.3 TFLOPS, in_features=1024, out_features=1024, bias=True)
+                (LayerNorm): LayerNorm(2.05 k, 0.00% Params, 0 MACs, 0.00% MACs, 377.25 us, 0.03% latency, 222.36 GFLOPS, (1024,), eps=1e-12, elementwise_affine=True)
+                (dropout): Dropout(0, 0.00% Params, 0 MACs, 0.00% MACs, 44.96 us, 0.00% latency, 0.0 FLOPS, p=0.1, inplace=False)
+              )
+            )
+            (intermediate): BertIntermediate(
+              4.2 M, 1.25% Params, 68.72 GMACs, 1.17% MACs, 11.73 ms, 0.89% latency, 11.71 TFLOPS, 
+              (dense): Linear(4.2 M, 1.25% Params, 68.72 GMACs, 1.17% MACs, 10.41 ms, 0.79% latency, 13.2 TFLOPS, in_features=1024, out_features=4096, bias=True)
+              (intermediate_act_fn): GELUActivation(0, 0.00% Params, 0 MACs, 0.00% MACs, 1.14 ms, 0.09% latency, 0.0 FLOPS, )
+            )
+            (output): BertOutput(
+              4.2 M, 1.25% Params, 68.72 GMACs, 1.17% MACs, 11.45 ms, 0.87% latency, 12.01 TFLOPS, 
+              (dense): Linear(4.2 M, 1.25% Params, 68.72 GMACs, 1.17% MACs, 10.32 ms, 0.78% latency, 13.32 TFLOPS, in_features=4096, out_features=1024, bias=True)
+              (LayerNorm): LayerNorm(2.05 k, 0.00% Params, 0 MACs, 0.00% MACs, 375.14 us, 0.03% latency, 223.62 GFLOPS, (1024,), eps=1e-12, elementwise_affine=True)
+              (dropout): Dropout(0, 0.00% Params, 0 MACs, 0.00% MACs, 46.98 us, 0.00% latency, 0.0 FLOPS, p=0.1, inplace=False)
+            )
+          )
+        )
+        (17): ModelShard(
+          12.6 M, 3.76% Params, 223.34 GMACs, 3.79% MACs, 48.54 ms, 3.67% latency, 9.21 TFLOPS, 
+          (model_shard): BertLayer(
+            12.6 M, 3.76% Params, 223.34 GMACs, 3.79% MACs, 48.43 ms, 3.66% latency, 9.23 TFLOPS, 
+            (attention): BertAttention(
+              4.2 M, 1.25% Params, 85.9 GMACs, 1.46% MACs, 23.69 ms, 1.79% latency, 7.26 TFLOPS, 
+              (self): BertSelfAttention(
+                3.15 M, 0.94% Params, 68.72 GMACs, 1.17% MACs, 19.43 ms, 1.47% latency, 7.08 TFLOPS, 
+                (query): Linear(1.05 M, 0.31% Params, 17.18 GMACs, 0.29% MACs, 2.93 ms, 0.22% latency, 11.71 TFLOPS, in_features=1024, out_features=1024, bias=True)
+                (key): Linear(1.05 M, 0.31% Params, 17.18 GMACs, 0.29% MACs, 2.92 ms, 0.22% latency, 11.77 TFLOPS, in_features=1024, out_features=1024, bias=True)
+                (value): Linear(1.05 M, 0.31% Params, 17.18 GMACs, 0.29% MACs, 2.91 ms, 0.22% latency, 11.8 TFLOPS, in_features=1024, out_features=1024, bias=True)
+                (dropout): Dropout(0, 0.00% Params, 0 MACs, 0.00% MACs, 1.92 us, 0.00% latency, 0.0 FLOPS, p=0.1, inplace=False)
+              )
+              (output): BertSelfOutput(
+                1.05 M, 0.31% Params, 17.18 GMACs, 0.29% MACs, 4.06 ms, 0.31% latency, 8.49 TFLOPS, 
+                (dense): Linear(1.05 M, 0.31% Params, 17.18 GMACs, 0.29% MACs, 2.92 ms, 0.22% latency, 11.75 TFLOPS, in_features=1024, out_features=1024, bias=True)
+                (LayerNorm): LayerNorm(2.05 k, 0.00% Params, 0 MACs, 0.00% MACs, 376.96 us, 0.03% latency, 222.53 GFLOPS, (1024,), eps=1e-12, elementwise_affine=True)
+                (dropout): Dropout(0, 0.00% Params, 0 MACs, 0.00% MACs, 46.5 us, 0.00% latency, 0.0 FLOPS, p=0.1, inplace=False)
+              )
+            )
+            (intermediate): BertIntermediate(
+              4.2 M, 1.25% Params, 68.72 GMACs, 1.17% MACs, 12.24 ms, 0.93% latency, 11.23 TFLOPS, 
+              (dense): Linear(4.2 M, 1.25% Params, 68.72 GMACs, 1.17% MACs, 10.92 ms, 0.83% latency, 12.59 TFLOPS, in_features=1024, out_features=4096, bias=True)
+              (intermediate_act_fn): GELUActivation(0, 0.00% Params, 0 MACs, 0.00% MACs, 1.13 ms, 0.09% latency, 0.0 FLOPS, )
+            )
+            (output): BertOutput(
+              4.2 M, 1.25% Params, 68.72 GMACs, 1.17% MACs, 12.15 ms, 0.92% latency, 11.32 TFLOPS, 
+              (dense): Linear(4.2 M, 1.25% Params, 68.72 GMACs, 1.17% MACs, 11.06 ms, 0.84% latency, 12.43 TFLOPS, in_features=4096, out_features=1024, bias=True)
+              (LayerNorm): LayerNorm(2.05 k, 0.00% Params, 0 MACs, 0.00% MACs, 364.32 us, 0.03% latency, 230.25 GFLOPS, (1024,), eps=1e-12, elementwise_affine=True)
+              (dropout): Dropout(0, 0.00% Params, 0 MACs, 0.00% MACs, 50.78 us, 0.00% latency, 0.0 FLOPS, p=0.1, inplace=False)
+            )
+          )
+        )
+        (18): ModelShard(
+          12.6 M, 3.76% Params, 223.34 GMACs, 3.79% MACs, 47.26 ms, 3.58% latency, 9.46 TFLOPS, 
+          (model_shard): BertLayer(
+            12.6 M, 3.76% Params, 223.34 GMACs, 3.79% MACs, 47.14 ms, 3.57% latency, 9.48 TFLOPS, 
+            (attention): BertAttention(
+              4.2 M, 1.25% Params, 85.9 GMACs, 1.46% MACs, 23.48 ms, 1.78% latency, 7.33 TFLOPS, 
+              (self): BertSelfAttention(
+                3.15 M, 0.94% Params, 68.72 GMACs, 1.17% MACs, 19.31 ms, 1.46% latency, 7.12 TFLOPS, 
+                (query): Linear(1.05 M, 0.31% Params, 17.18 GMACs, 0.29% MACs, 3.0 ms, 0.23% latency, 11.44 TFLOPS, in_features=1024, out_features=1024, bias=True)
+                (key): Linear(1.05 M, 0.31% Params, 17.18 GMACs, 0.29% MACs, 2.99 ms, 0.23% latency, 11.49 TFLOPS, in_features=1024, out_features=1024, bias=True)
+                (value): Linear(1.05 M, 0.31% Params, 17.18 GMACs, 0.29% MACs, 2.82 ms, 0.21% latency, 12.19 TFLOPS, in_features=1024, out_features=1024, bias=True)
+                (dropout): Dropout(0, 0.00% Params, 0 MACs, 0.00% MACs, 1.89 us, 0.00% latency, 0.0 FLOPS, p=0.1, inplace=False)
+              )
+              (output): BertSelfOutput(
+                1.05 M, 0.31% Params, 17.18 GMACs, 0.29% MACs, 3.95 ms, 0.30% latency, 8.71 TFLOPS, 
+                (dense): Linear(1.05 M, 0.31% Params, 17.18 GMACs, 0.29% MACs, 2.82 ms, 0.21% latency, 12.17 TFLOPS, in_features=1024, out_features=1024, bias=True)
+                (LayerNorm): LayerNorm(2.05 k, 0.00% Params, 0 MACs, 0.00% MACs, 382.62 us, 0.03% latency, 219.24 GFLOPS, (1024,), eps=1e-12, elementwise_affine=True)
+                (dropout): Dropout(0, 0.00% Params, 0 MACs, 0.00% MACs, 45.34 us, 0.00% latency, 0.0 FLOPS, p=0.1, inplace=False)
+              )
+            )
+            (intermediate): BertIntermediate(
+              4.2 M, 1.25% Params, 68.72 GMACs, 1.17% MACs, 11.78 ms, 0.89% latency, 11.67 TFLOPS, 
+              (dense): Linear(4.2 M, 1.25% Params, 68.72 GMACs, 1.17% MACs, 10.45 ms, 0.79% latency, 13.16 TFLOPS, in_features=1024, out_features=4096, bias=True)
+              (intermediate_act_fn): GELUActivation(0, 0.00% Params, 0 MACs, 0.00% MACs, 1.13 ms, 0.09% latency, 0.0 FLOPS, )
+            )
+            (output): BertOutput(
+              4.2 M, 1.25% Params, 68.72 GMACs, 1.17% MACs, 11.55 ms, 0.87% latency, 11.91 TFLOPS, 
+              (dense): Linear(4.2 M, 1.25% Params, 68.72 GMACs, 1.17% MACs, 10.45 ms, 0.79% latency, 13.15 TFLOPS, in_features=4096, out_features=1024, bias=True)
+              (LayerNorm): LayerNorm(2.05 k, 0.00% Params, 0 MACs, 0.00% MACs, 375.33 us, 0.03% latency, 223.5 GFLOPS, (1024,), eps=1e-12, elementwise_affine=True)
+              (dropout): Dropout(0, 0.00% Params, 0 MACs, 0.00% MACs, 44.83 us, 0.00% latency, 0.0 FLOPS, p=0.1, inplace=False)
+            )
+          )
+        )
+        (19): ModelShard(
+          12.6 M, 3.76% Params, 223.34 GMACs, 3.79% MACs, 47.97 ms, 3.63% latency, 9.32 TFLOPS, 
+          (model_shard): BertLayer(
+            12.6 M, 3.76% Params, 223.34 GMACs, 3.79% MACs, 47.86 ms, 3.62% latency, 9.34 TFLOPS, 
+            (attention): BertAttention(
+              4.2 M, 1.25% Params, 85.9 GMACs, 1.46% MACs, 23.59 ms, 1.78% latency, 7.29 TFLOPS, 
+              (self): BertSelfAttention(
+                3.15 M, 0.94% Params, 68.72 GMACs, 1.17% MACs, 19.38 ms, 1.47% latency, 7.1 TFLOPS, 
+                (query): Linear(1.05 M, 0.31% Params, 17.18 GMACs, 0.29% MACs, 2.93 ms, 0.22% latency, 11.73 TFLOPS, in_features=1024, out_features=1024, bias=True)
+                (key): Linear(1.05 M, 0.31% Params, 17.18 GMACs, 0.29% MACs, 2.92 ms, 0.22% latency, 11.75 TFLOPS, in_features=1024, out_features=1024, bias=True)
+                (value): Linear(1.05 M, 0.31% Params, 17.18 GMACs, 0.29% MACs, 2.92 ms, 0.22% latency, 11.79 TFLOPS, in_features=1024, out_features=1024, bias=True)
+                (dropout): Dropout(0, 0.00% Params, 0 MACs, 0.00% MACs, 1.92 us, 0.00% latency, 0.0 FLOPS, p=0.1, inplace=False)
+              )
+              (output): BertSelfOutput(
+                1.05 M, 0.31% Params, 17.18 GMACs, 0.29% MACs, 4.0 ms, 0.30% latency, 8.61 TFLOPS, 
+                (dense): Linear(1.05 M, 0.31% Params, 17.18 GMACs, 0.29% MACs, 2.89 ms, 0.22% latency, 11.89 TFLOPS, in_features=1024, out_features=1024, bias=True)
+                (LayerNorm): LayerNorm(2.05 k, 0.00% Params, 0 MACs, 0.00% MACs, 373.54 us, 0.03% latency, 224.57 GFLOPS, (1024,), eps=1e-12, elementwise_affine=True)
+                (dropout): Dropout(0, 0.00% Params, 0 MACs, 0.00% MACs, 50.94 us, 0.00% latency, 0.0 FLOPS, p=0.1, inplace=False)
+              )
+            )
+            (intermediate): BertIntermediate(
+              4.2 M, 1.25% Params, 68.72 GMACs, 1.17% MACs, 12.11 ms, 0.92% latency, 11.35 TFLOPS, 
+              (dense): Linear(4.2 M, 1.25% Params, 68.72 GMACs, 1.17% MACs, 10.79 ms, 0.82% latency, 12.73 TFLOPS, in_features=1024, out_features=4096, bias=True)
+              (intermediate_act_fn): GELUActivation(0, 0.00% Params, 0 MACs, 0.00% MACs, 1.13 ms, 0.09% latency, 0.0 FLOPS, )
+            )
+            (output): BertOutput(
+              4.2 M, 1.25% Params, 68.72 GMACs, 1.17% MACs, 11.81 ms, 0.89% latency, 11.64 TFLOPS, 
+              (dense): Linear(4.2 M, 1.25% Params, 68.72 GMACs, 1.17% MACs, 10.71 ms, 0.81% latency, 12.84 TFLOPS, in_features=4096, out_features=1024, bias=True)
+              (LayerNorm): LayerNorm(2.05 k, 0.00% Params, 0 MACs, 0.00% MACs, 367.26 us, 0.03% latency, 228.41 GFLOPS, (1024,), eps=1e-12, elementwise_affine=True)
+              (dropout): Dropout(0, 0.00% Params, 0 MACs, 0.00% MACs, 47.23 us, 0.00% latency, 0.0 FLOPS, p=0.1, inplace=False)
+            )
+          )
+        )
+        (20): ModelShard(
+          12.6 M, 3.76% Params, 223.34 GMACs, 3.79% MACs, 46.79 ms, 3.54% latency, 9.55 TFLOPS, 
+          (model_shard): BertLayer(
+            12.6 M, 3.76% Params, 223.34 GMACs, 3.79% MACs, 46.67 ms, 3.53% latency, 9.58 TFLOPS, 
+            (attention): BertAttention(
+              4.2 M, 1.25% Params, 85.9 GMACs, 1.46% MACs, 23.09 ms, 1.75% latency, 7.45 TFLOPS, 
+              (self): BertSelfAttention(
+                3.15 M, 0.94% Params, 68.72 GMACs, 1.17% MACs, 18.99 ms, 1.44% latency, 7.24 TFLOPS, 
+                (query): Linear(1.05 M, 0.31% Params, 17.18 GMACs, 0.29% MACs, 2.9 ms, 0.22% latency, 11.83 TFLOPS, in_features=1024, out_features=1024, bias=True)
+                (key): Linear(1.05 M, 0.31% Params, 17.18 GMACs, 0.29% MACs, 2.83 ms, 0.21% latency, 12.15 TFLOPS, in_features=1024, out_features=1024, bias=True)
+                (value): Linear(1.05 M, 0.31% Params, 17.18 GMACs, 0.29% MACs, 2.78 ms, 0.21% latency, 12.36 TFLOPS, in_features=1024, out_features=1024, bias=True)
+                (dropout): Dropout(0, 0.00% Params, 0 MACs, 0.00% MACs, 1.89 us, 0.00% latency, 0.0 FLOPS, p=0.1, inplace=False)
+              )
+              (output): BertSelfOutput(
+                1.05 M, 0.31% Params, 17.18 GMACs, 0.29% MACs, 3.9 ms, 0.30% latency, 8.83 TFLOPS, 
+                (dense): Linear(1.05 M, 0.31% Params, 17.18 GMACs, 0.29% MACs, 2.79 ms, 0.21% latency, 12.3 TFLOPS, in_features=1024, out_features=1024, bias=True)
+                (LayerNorm): LayerNorm(2.05 k, 0.00% Params, 0 MACs, 0.00% MACs, 377.5 us, 0.03% latency, 222.21 GFLOPS, (1024,), eps=1e-12, elementwise_affine=True)
+                (dropout): Dropout(0, 0.00% Params, 0 MACs, 0.00% MACs, 51.46 us, 0.00% latency, 0.0 FLOPS, p=0.1, inplace=False)
+              )
+            )
+            (intermediate): BertIntermediate(
+              4.2 M, 1.25% Params, 68.72 GMACs, 1.17% MACs, 11.76 ms, 0.89% latency, 11.69 TFLOPS, 
+              (dense): Linear(4.2 M, 1.25% Params, 68.72 GMACs, 1.17% MACs, 10.43 ms, 0.79% latency, 13.18 TFLOPS, in_features=1024, out_features=4096, bias=True)
+              (intermediate_act_fn): GELUActivation(0, 0.00% Params, 0 MACs, 0.00% MACs, 1.14 ms, 0.09% latency, 0.0 FLOPS, )
+            )
+            (output): BertOutput(
+              4.2 M, 1.25% Params, 68.72 GMACs, 1.17% MACs, 11.46 ms, 0.87% latency, 12.0 TFLOPS, 
+              (dense): Linear(4.2 M, 1.25% Params, 68.72 GMACs, 1.17% MACs, 10.37 ms, 0.78% latency, 13.26 TFLOPS, in_features=4096, out_features=1024, bias=True)
+              (LayerNorm): LayerNorm(2.05 k, 0.00% Params, 0 MACs, 0.00% MACs, 369.54 us, 0.03% latency, 227.0 GFLOPS, (1024,), eps=1e-12, elementwise_affine=True)
+              (dropout): Dropout(0, 0.00% Params, 0 MACs, 0.00% MACs, 45.06 us, 0.00% latency, 0.0 FLOPS, p=0.1, inplace=False)
+            )
+          )
+        )
+        (21): ModelShard(
+          12.6 M, 3.76% Params, 223.34 GMACs, 3.79% MACs, 47.45 ms, 3.59% latency, 9.42 TFLOPS, 
+          (model_shard): BertLayer(
+            12.6 M, 3.76% Params, 223.34 GMACs, 3.79% MACs, 47.33 ms, 3.58% latency, 9.44 TFLOPS, 
+            (attention): BertAttention(
+              4.2 M, 1.25% Params, 85.9 GMACs, 1.46% MACs, 23.4 ms, 1.77% latency, 7.35 TFLOPS, 
+              (self): BertSelfAttention(
+                3.15 M, 0.94% Params, 68.72 GMACs, 1.17% MACs, 19.22 ms, 1.45% latency, 7.16 TFLOPS, 
+                (query): Linear(1.05 M, 0.31% Params, 17.18 GMACs, 0.29% MACs, 2.9 ms, 0.22% latency, 11.85 TFLOPS, in_features=1024, out_features=1024, bias=True)
+                (key): Linear(1.05 M, 0.31% Params, 17.18 GMACs, 0.29% MACs, 2.89 ms, 0.22% latency, 11.91 TFLOPS, in_features=1024, out_features=1024, bias=True)
+                (value): Linear(1.05 M, 0.31% Params, 17.18 GMACs, 0.29% MACs, 2.87 ms, 0.22% latency, 11.96 TFLOPS, in_features=1024, out_features=1024, bias=True)
+                (dropout): Dropout(0, 0.00% Params, 0 MACs, 0.00% MACs, 1.89 us, 0.00% latency, 0.0 FLOPS, p=0.1, inplace=False)
+              )
+              (output): BertSelfOutput(
+                1.05 M, 0.31% Params, 17.18 GMACs, 0.29% MACs, 3.98 ms, 0.30% latency, 8.65 TFLOPS, 
+                (dense): Linear(1.05 M, 0.31% Params, 17.18 GMACs, 0.29% MACs, 2.87 ms, 0.22% latency, 11.96 TFLOPS, in_features=1024, out_features=1024, bias=True)
+                (LayerNorm): LayerNorm(2.05 k, 0.00% Params, 0 MACs, 0.00% MACs, 380.54 us, 0.03% latency, 220.44 GFLOPS, (1024,), eps=1e-12, elementwise_affine=True)
+                (dropout): Dropout(0, 0.00% Params, 0 MACs, 0.00% MACs, 45.09 us, 0.00% latency, 0.0 FLOPS, p=0.1, inplace=False)
+              )
+            )
+            (intermediate): BertIntermediate(
+              4.2 M, 1.25% Params, 68.72 GMACs, 1.17% MACs, 11.93 ms, 0.90% latency, 11.52 TFLOPS, 
+              (dense): Linear(4.2 M, 1.25% Params, 68.72 GMACs, 1.17% MACs, 10.62 ms, 0.80% latency, 12.94 TFLOPS, in_features=1024, out_features=4096, bias=True)
+              (intermediate_act_fn): GELUActivation(0, 0.00% Params, 0 MACs, 0.00% MACs, 1.13 ms, 0.09% latency, 0.0 FLOPS, )
+            )
+            (output): BertOutput(
+              4.2 M, 1.25% Params, 68.72 GMACs, 1.17% MACs, 11.65 ms, 0.88% latency, 11.8 TFLOPS, 
+              (dense): Linear(4.2 M, 1.25% Params, 68.72 GMACs, 1.17% MACs, 10.57 ms, 0.80% latency, 13.01 TFLOPS, in_features=4096, out_features=1024, bias=True)
+              (LayerNorm): LayerNorm(2.05 k, 0.00% Params, 0 MACs, 0.00% MACs, 369.73 us, 0.03% latency, 226.89 GFLOPS, (1024,), eps=1e-12, elementwise_affine=True)
+              (dropout): Dropout(0, 0.00% Params, 0 MACs, 0.00% MACs, 45.15 us, 0.00% latency, 0.0 FLOPS, p=0.1, inplace=False)
+            )
+          )
+        )
+        (22): ModelShard(
+          12.6 M, 3.76% Params, 223.34 GMACs, 3.79% MACs, 46.91 ms, 3.55% latency, 9.53 TFLOPS, 
+          (model_shard): BertLayer(
+            12.6 M, 3.76% Params, 223.34 GMACs, 3.79% MACs, 46.8 ms, 3.54% latency, 9.55 TFLOPS, 
+            (attention): BertAttention(
+              4.2 M, 1.25% Params, 85.9 GMACs, 1.46% MACs, 23.03 ms, 1.74% latency, 7.47 TFLOPS, 
+              (self): BertSelfAttention(
+                3.15 M, 0.94% Params, 68.72 GMACs, 1.17% MACs, 18.9 ms, 1.43% latency, 7.28 TFLOPS, 
+                (query): Linear(1.05 M, 0.31% Params, 17.18 GMACs, 0.29% MACs, 2.86 ms, 0.22% latency, 12.02 TFLOPS, in_features=1024, out_features=1024, bias=True)
+                (key): Linear(1.05 M, 0.31% Params, 17.18 GMACs, 0.29% MACs, 2.8 ms, 0.21% latency, 12.28 TFLOPS, in_features=1024, out_features=1024, bias=True)
+                (value): Linear(1.05 M, 0.31% Params, 17.18 GMACs, 0.29% MACs, 2.78 ms, 0.21% latency, 12.36 TFLOPS, in_features=1024, out_features=1024, bias=True)
+                (dropout): Dropout(0, 0.00% Params, 0 MACs, 0.00% MACs, 1.92 us, 0.00% latency, 0.0 FLOPS, p=0.1, inplace=False)
+              )
+              (output): BertSelfOutput(
+                1.05 M, 0.31% Params, 17.18 GMACs, 0.29% MACs, 3.93 ms, 0.30% latency, 8.76 TFLOPS, 
+                (dense): Linear(1.05 M, 0.31% Params, 17.18 GMACs, 0.29% MACs, 2.8 ms, 0.21% latency, 12.29 TFLOPS, in_features=1024, out_features=1024, bias=True)
+                (LayerNorm): LayerNorm(2.05 k, 0.00% Params, 0 MACs, 0.00% MACs, 381.09 us, 0.03% latency, 220.12 GFLOPS, (1024,), eps=1e-12, elementwise_affine=True)
+                (dropout): Dropout(0, 0.00% Params, 0 MACs, 0.00% MACs, 44.45 us, 0.00% latency, 0.0 FLOPS, p=0.1, inplace=False)
+              )
+            )
+            (intermediate): BertIntermediate(
+              4.2 M, 1.25% Params, 68.72 GMACs, 1.17% MACs, 11.85 ms, 0.90% latency, 11.59 TFLOPS, 
+              (dense): Linear(4.2 M, 1.25% Params, 68.72 GMACs, 1.17% MACs, 10.53 ms, 0.80% latency, 13.05 TFLOPS, in_features=1024, out_features=4096, bias=True)
+              (intermediate_act_fn): GELUActivation(0, 0.00% Params, 0 MACs, 0.00% MACs, 1.13 ms, 0.09% latency, 0.0 FLOPS, )
+            )
+            (output): BertOutput(
+              4.2 M, 1.25% Params, 68.72 GMACs, 1.17% MACs, 11.58 ms, 0.88% latency, 11.87 TFLOPS, 
+              (dense): Linear(4.2 M, 1.25% Params, 68.72 GMACs, 1.17% MACs, 10.48 ms, 0.79% latency, 13.12 TFLOPS, in_features=4096, out_features=1024, bias=True)
+              (LayerNorm): LayerNorm(2.05 k, 0.00% Params, 0 MACs, 0.00% MACs, 371.55 us, 0.03% latency, 225.77 GFLOPS, (1024,), eps=1e-12, elementwise_affine=True)
+              (dropout): Dropout(0, 0.00% Params, 0 MACs, 0.00% MACs, 48.35 us, 0.00% latency, 0.0 FLOPS, p=0.1, inplace=False)
+            )
+          )
+        )
+        (23): ModelShard(
+          12.6 M, 3.76% Params, 223.34 GMACs, 3.79% MACs, 47.55 ms, 3.60% latency, 9.4 TFLOPS, 
+          (model_shard): BertLayer(
+            12.6 M, 3.76% Params, 223.34 GMACs, 3.79% MACs, 47.44 ms, 3.59% latency, 9.42 TFLOPS, 
+            (attention): BertAttention(
+              4.2 M, 1.25% Params, 85.9 GMACs, 1.46% MACs, 23.41 ms, 1.77% latency, 7.35 TFLOPS, 
+              (self): BertSelfAttention(
+                3.15 M, 0.94% Params, 68.72 GMACs, 1.17% MACs, 19.22 ms, 1.45% latency, 7.16 TFLOPS, 
+                (query): Linear(1.05 M, 0.31% Params, 17.18 GMACs, 0.29% MACs, 2.91 ms, 0.22% latency, 11.83 TFLOPS, in_features=1024, out_features=1024, bias=True)
+                (key): Linear(1.05 M, 0.31% Params, 17.18 GMACs, 0.29% MACs, 2.89 ms, 0.22% latency, 11.89 TFLOPS, in_features=1024, out_features=1024, bias=True)
+                (value): Linear(1.05 M, 0.31% Params, 17.18 GMACs, 0.29% MACs, 2.88 ms, 0.22% latency, 11.93 TFLOPS, in_features=1024, out_features=1024, bias=True)
+                (dropout): Dropout(0, 0.00% Params, 0 MACs, 0.00% MACs, 1.89 us, 0.00% latency, 0.0 FLOPS, p=0.1, inplace=False)
+              )
+              (output): BertSelfOutput(
+                1.05 M, 0.31% Params, 17.18 GMACs, 0.29% MACs, 3.97 ms, 0.30% latency, 8.67 TFLOPS, 
+                (dense): Linear(1.05 M, 0.31% Params, 17.18 GMACs, 0.29% MACs, 2.86 ms, 0.22% latency, 12.03 TFLOPS, in_features=1024, out_features=1024, bias=True)
+                (LayerNorm): LayerNorm(2.05 k, 0.00% Params, 0 MACs, 0.00% MACs, 371.71 us, 0.03% latency, 225.67 GFLOPS, (1024,), eps=1e-12, elementwise_affine=True)
+                (dropout): Dropout(0, 0.00% Params, 0 MACs, 0.00% MACs, 44.83 us, 0.00% latency, 0.0 FLOPS, p=0.1, inplace=False)
+              )
+            )
+            (intermediate): BertIntermediate(
+              4.2 M, 1.25% Params, 68.72 GMACs, 1.17% MACs, 12.0 ms, 0.91% latency, 11.46 TFLOPS, 
+              (dense): Linear(4.2 M, 1.25% Params, 68.72 GMACs, 1.17% MACs, 10.67 ms, 0.81% latency, 12.88 TFLOPS, in_features=1024, out_features=4096, bias=True)
+              (intermediate_act_fn): GELUActivation(0, 0.00% Params, 0 MACs, 0.00% MACs, 1.13 ms, 0.09% latency, 0.0 FLOPS, )
+            )
+            (output): BertOutput(
+              4.2 M, 1.25% Params, 68.72 GMACs, 1.17% MACs, 11.69 ms, 0.88% latency, 11.77 TFLOPS, 
+              (dense): Linear(4.2 M, 1.25% Params, 68.72 GMACs, 1.17% MACs, 10.58 ms, 0.80% latency, 12.99 TFLOPS, in_features=4096, out_features=1024, bias=True)
+              (LayerNorm): LayerNorm(2.05 k, 0.00% Params, 0 MACs, 0.00% MACs, 372.06 us, 0.03% latency, 225.46 GFLOPS, (1024,), eps=1e-12, elementwise_affine=True)
+              (dropout): Dropout(0, 0.00% Params, 0 MACs, 0.00% MACs, 45.47 us, 0.00% latency, 0.0 FLOPS, p=0.1, inplace=False)
+            )
+          )
+        )
+      )
+    )
+  )
+  (cls): BertOnlyMLMHead(
+    32.34 M, 9.65% Params, 529.25 GMACs, 8.99% MACs, 99.17 ms, 7.50% latency, 10.68 TFLOPS, 
+    (predictions): BertLMPredictionHead(
+      32.34 M, 9.65% Params, 529.25 GMACs, 8.99% MACs, 99.04 ms, 7.49% latency, 10.69 TFLOPS, 
+      (transform): BertPredictionHeadTransform(
+        1.05 M, 0.31% Params, 17.18 GMACs, 0.29% MACs, 3.9 ms, 0.29% latency, 8.84 TFLOPS, 
+        (dense): Linear(1.05 M, 0.31% Params, 17.18 GMACs, 0.29% MACs, 2.88 ms, 0.22% latency, 11.94 TFLOPS, in_features=1024, out_features=1024, bias=True)
+        (transform_act_fn): GELUActivation(0, 0.00% Params, 0 MACs, 0.00% MACs, 308.19 us, 0.02% latency, 0.0 FLOPS, )
+        (LayerNorm): LayerNorm(2.05 k, 0.00% Params, 0 MACs, 0.00% MACs, 427.49 us, 0.03% latency, 196.23 GFLOPS, (1024,), eps=1e-12, elementwise_affine=True)
+      )
+      (decoder): Linear(31.29 M, 9.33% Params, 512.07 GMACs, 8.69% MACs, 94.9 ms, 7.18% latency, 10.79 TFLOPS, in_features=1024, out_features=30522, bias=True)
+    )
+  )
+)
+------------------------------------------------------------------------------
+end_max: 4302617088
+end_now 2166667776
+batch_time_list [2.643833637237549, 1.2257628440856934, 1.2235743999481201, 1.5089335441589355]
+The total time cost is: 41.63170909881592s

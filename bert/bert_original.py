@@ -23,7 +23,7 @@ from dummy_dataloader import prepare_dataloader
 from torch.optim import SGD, Adam
 from lib.transformers import BertConfig,BertForMaskedLM  # lib
 from utils import get_parser, seed_all
-from validate import validate
+from validate_old import validate
 from train import train
 
 

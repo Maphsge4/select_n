@@ -13,7 +13,7 @@ from dummy_dataloader import prepare_dataloader
 from lib.my_offload import OffloadModel
 from lib.transformers import GPT2Config, GPT2Model
 from utils import seed_all, get_parser
-from validate import validate
+from validate_old import validate
 from train import train
 
 model_name = 'gpt2'
