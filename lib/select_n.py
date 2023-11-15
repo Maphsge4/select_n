@@ -592,7 +592,7 @@ class OffloadModel(nn.Module):
             if index >= 0:
                 inputs = last_inputs  # 叶博改的
                 nvtx.range_push(f"shard {index} forward")
-                torch.cuda.synchronize()
+                # torch.cuda.synchronize()
                 with torch.cuda.stream(forward_stream):
                     inputs = self.model_slices[index](*inputs)
                     # if index % 23 == 0 and index !=0:  # 两个流3没问题，4有问题；每次新流，
@@ -618,7 +618,7 @@ class OffloadModel(nn.Module):
                 last_inputs = inputs  # 叶博修改的
 
         # nvtx.range_push("synchronize")
-        torch.cuda.synchronize()
+        # torch.cuda.synchronize()
         # # print(last_inputs)
         # nvtx.range_pop()
         result = last_inputs

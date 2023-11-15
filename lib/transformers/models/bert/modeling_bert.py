@@ -906,6 +906,14 @@ class BertModel(BertPreTrainedModel):
             for i, m in enumerate(self.encoder.model_slices):
                 if self.encoder.device_list[i] == 1:
                     self.encoder.model_slices[i].cuda()
+                    
+    def delete(self):
+        del self.embeddings
+        # self.pooler = self.pooler.cuda()
+        # if self.mode == "select":
+        #     for i, m in enumerate(self.encoder.model_slices):
+        #         if self.encoder.device_list[i] == 1:
+        #             self.encoder.model_slices[i].cpu()
 
     def get_input_embeddings(self):
         return self.embeddings.word_embeddings

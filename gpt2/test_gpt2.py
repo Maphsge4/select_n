@@ -13,7 +13,7 @@ from train import train
 from copy import deepcopy
 
 model_name = 'gpt2'
-total_iter = 100
+total_iter = 50  # 原来是100
 
 def init_all():
     global args

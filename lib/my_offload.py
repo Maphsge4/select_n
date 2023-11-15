@@ -585,7 +585,7 @@ class OffloadModel(nn.Module):
                 nvtx.range_push(f"shard {index} forward")
 
                 # inputs = self.model_slices[index](*inputs)[0]
-                torch.cuda.synchronize()  # 同步0909  为什么offload没同步？
+                torch.cuda.synchronize()  # 1115 test
                 # torch.cuda.current_stream().wait_stream(self.model_slices[index]._cpu_to_gpu_stream)
                 # self.model_slices[index]._cpu_to_gpu_stream.synchronize()
                 inputs = self.model_slices[index](*inputs)

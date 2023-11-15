@@ -38,14 +38,6 @@
             "justMyCode": false
         },
         {
-            "name": "test",
-            "type": "python",
-            "request": "launch",
-            "program": "memory_plot_test.py",
-            "console": "integratedTerminal",
-            "justMyCode": false
-        },
-        {
             "name": "GPT2 SELECT n",
             "type": "python",
             "request": "launch",
@@ -78,10 +70,10 @@
             "justMyCode": false
         },
         {
-            "name": "test",
+            "name": "test_bert",
             "type": "python",
             "request": "launch",
-            "module": "test.offload_test",
+            "module": "bert.test_bert",
             "console": "integratedTerminal",
             "justMyCode": false
         }
