@@ -76,6 +76,22 @@
             "module": "bert.test_bert",
             "console": "integratedTerminal",
             "justMyCode": false
+        },
+        {
+            "name": "linear_select_n",
+            "type": "python",
+            "request": "launch",
+            "module": "bert.linear_select_n",
+            "console": "integratedTerminal",
+            "justMyCode": false
+        },
+        {
+            "name": "linear_slice",
+            "type": "python",
+            "request": "launch",
+            "module": "bert.linear_slice",
+            "console": "integratedTerminal",
+            "justMyCode": false
         }
     ]
 }

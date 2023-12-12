@@ -701,6 +701,7 @@ class BertLMPredictionHead(nn.Module):
     def forward(self, hidden_states):
         hidden_states = self.transform(hidden_states)
         hidden_states = self.decoder(hidden_states)
+        # print("start on-time", torch.cuda.memory_allocated(device=torch.device("cuda")))  # 显存量
         return hidden_states
 
 
@@ -1410,6 +1411,7 @@ class BertForMaskedLM(BertPreTrainedModel):
 
         sequence_output = outputs[0]
         # print("sequence output shape", sequence_output.shape)  # 叶博0909让加的
+        
         prediction_scores = self.cls(sequence_output)
         # print("cls end on-time", torch.cuda.memory_allocated(device=torch.device("cuda")))  # 显存量
 

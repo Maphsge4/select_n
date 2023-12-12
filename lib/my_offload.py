@@ -47,7 +47,7 @@ def _split(modules: nn.Sequential, number_splits: int) -> List[List[nn.Module]]:
     total_number_params = sum([sum(p.numel() for p in m.parameters()) for m in modules])
     number_parameters_per_shard = total_number_params // number_splits
 
-    current_shard = 0
+    current_shard = -1
 
     # maphsge4 add
     # print(f"This model has {total_number_params/1e6:.2f}M parameters, aiming for {number_parameters_per_shard/1e6:.2f}M parameters per shard")
@@ -61,13 +61,14 @@ def _split(modules: nn.Sequential, number_splits: int) -> List[List[nn.Module]]:
         # Number of parameters in the current shard
         current_shard_params = sum(p.numel() for sm in splits[current_shard] for p in sm.parameters())
 
-        # This shard is big enough, point to the next one
-        if (
-                current_shard_params > 0
-                and current_shard_params + sum(p.numel() for p in m.parameters()) > number_parameters_per_shard
-                and current_shard < number_splits - 1
-        ):
-            current_shard += 1
+        # # This shard is big enough, point to the next one
+        # if (
+        #         current_shard_params > 0
+        #         and current_shard_params + sum(p.numel() for p in m.parameters()) > number_parameters_per_shard
+        #         and current_shard < number_splits - 1
+        # ):
+        #     current_shard += 1
+        current_shard += 1
 
         splits[current_shard].append(m)
 
@@ -586,12 +587,8 @@ class OffloadModel(nn.Module):
 
                 # inputs = self.model_slices[index](*inputs)[0]
                 torch.cuda.synchronize()  # 1115 test
-                # torch.cuda.current_stream().wait_stream(self.model_slices[index]._cpu_to_gpu_stream)
-                # self.model_slices[index]._cpu_to_gpu_stream.synchronize()
+                
                 inputs = self.model_slices[index](*inputs)
-                # print(f"iter {index}", inputs)  # debug
-                # print(f"index {index} on-time:", torch.cuda.memory_allocated(device=torch.device("cuda")))  # 显存量
-                # print(f"index {index} max:", torch.cuda.max_memory_allocated(device=torch.device("cuda")))  # 显存量
                 nvtx.range_pop()
                 # tmp = time.time() - start
                 # print("self.hh time:", tmp)  # debug
@@ -604,7 +601,7 @@ class OffloadModel(nn.Module):
                 # self._activations[index] = tuple([a.cpu() for a in list(self._activations[index])])
                 last_inputs = inputs  # 叶博修改的
                 # nvtx.range_pop()
-
+            
         # result = self._activations[-1]
         # result = tuple([r.cuda() for r in result])
         # torch.cuda.synchronize()  # 在slice模式下，如果只在这里synchronize，bert的结果也不对

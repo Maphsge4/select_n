@@ -60,6 +60,7 @@ def validate(
                 output = model(images)
                 if model_name == "gpt2":
                     output = output.last_hidden_state
+                # del output
                 # print(model)
                 # loss = criterion(output[0], target)
                 # print("loss: ", loss)  # debug

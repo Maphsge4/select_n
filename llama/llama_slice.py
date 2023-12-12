@@ -47,7 +47,7 @@ def main():
     # model.cuda()
     model.to_cuda()  # maphsge4 modify
 
-    print("现在的")
+    # print("现在的")
     print("max:", torch.cuda.max_memory_allocated(device=torch.device("cuda")))  # 显存量
     print("now", torch.cuda.memory_allocated(device=torch.device("cuda")))  # 显存量
                     

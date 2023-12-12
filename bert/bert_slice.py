@@ -58,7 +58,7 @@ def main():
     model.cls.cuda()  # load final lm head to cuda
     print(f"=> model params: {sum(p.numel() for p in model.parameters())}")
 
-    bert_data_loader = prepare_dataloader(2 * args.batch_size, args.batch_size, config.vocab_size)  # 原来是4
+    bert_data_loader = prepare_dataloader(20 * args.batch_size, args.batch_size, config.vocab_size)  # 原来是4
     criterion = nn.CrossEntropyLoss()
     optimizer = Adam(model.parameters(), lr=args.lr)
 

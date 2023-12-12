@@ -353,9 +353,9 @@ class ShardSyncLayer(torch.autograd.Function):
         # if drop_index >= 0 :  # maphsge4 modify 0907
             # Move shard from device to offload device.
             nvtx.range_push(f"forward_drop{drop_index}")
-            print(f"shard {drop_index} drop前：", torch.cuda.memory_allocated(device=torch.device("cuda")))  # 显存量
+            # print(f"shard {drop_index} drop前：", torch.cuda.memory_allocated(device=torch.device("cuda")))  # 显存量
             model_slices[drop_index].forward_drop()
-            print(f"shard {drop_index} drop后：", torch.cuda.memory_allocated(device=torch.device("cuda")))  # 显存量
+            # print(f"shard {drop_index} drop后：", torch.cuda.memory_allocated(device=torch.device("cuda")))  # 显存量
             nvtx.range_pop()
         # else:  # add select n
         #     print(model_instance.device_list)  # debug

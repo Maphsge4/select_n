@@ -514,9 +514,11 @@ class OffloadModel(nn.Module):
                     self.start_list.append(index)
                 if index != len(self.device_list) - 1 and self.device_list[index + 1] == 0:
                     self.end_list.append(index)
-        print(self.select_list)  # debug
-        print(self.start_list)  # debug
-        print(self.end_list)  # debug
+        if len(self.start_list) > len(self.select_list):
+            self.start_list.pop()  # 如果最后是1且后无0，就删除最后一个start
+        print("select_list: ",self.select_list)  # debug
+        print("start_list: ",self.start_list)  # debug
+        print("end_list: ",self.end_list)  # debug
 
         # TODO(anj): Add an experimental flag for using this instead of modifying the
         # arg type.
@@ -586,13 +588,17 @@ class OffloadModel(nn.Module):
         last_inputs = inputs
 
         # nvtx.range_push("synchronize")
-        # torch.cuda.synchronize()
+        # torch.cuda.synchronize()  # 目前认为这个同步暂时不需要
         # nvtx.range_pop()
         for index in range(-1, len(self.model_slices)):
             if index >= 0:
+                # print("max:", torch.cuda.max_memory_allocated(device=torch.device("cuda")))  # 显存量
+                # print("now", torch.cuda.memory_allocated(device=torch.device("cuda")))  # 显存量
+
                 inputs = last_inputs  # 叶博改的
                 nvtx.range_push(f"shard {index} forward")
-                # torch.cuda.synchronize()
+                # torch.cuda.current_stream().synchronize()  # 1115 叶博
+                torch.cuda.synchronize()  # 目前认为中间必须有一个同步
                 with torch.cuda.stream(forward_stream):
                     inputs = self.model_slices[index](*inputs)
                     # if index % 23 == 0 and index !=0:  # 两个流3没问题，4有问题；每次新流，
@@ -602,12 +608,12 @@ class OffloadModel(nn.Module):
                 if len(start_list) > 0 and index == start_list[0]:
                     start_list.pop(0)
                     select_id = select_list.pop(0)
-                    # 理论上这里要加一个同步，问问叶博
                     self.model_slices[select_id].forward_load()
+                    # torch.cuda.synchronize()  # 理论上这里要加一个同步，问问叶博
 
                 if len(end_list) > 0 and index == end_list[0]:
                     end_list.pop(0)
-                    cpu_to_gpu_stream.synchronize()  # 确保下一片已经都传到了device上  
+                    # torch.cuda.current_stream().synchronize()  # 1115 叶博  # 确保下一片已经都传到了device上  
             
             # Call the custom autograd hooks (discard/load slices FW and BW)
             inputs = ShardSyncLayer.apply(inputs, index, self.model_slices, self.device_list, self)  # 手动实现
@@ -617,9 +623,12 @@ class OffloadModel(nn.Module):
                 # self._activations[index] = tuple([a.cpu() for a in list(self._activations[index])])
                 last_inputs = inputs  # 叶博修改的
 
+            # print("max:", torch.cuda.max_memory_allocated(device=torch.device("cuda")))  # 显存量
+            print(f"{index}end-time", torch.cuda.memory_allocated(device=torch.device("cuda")))  # 显存量
+
         # nvtx.range_push("synchronize")
-        # torch.cuda.synchronize()
-        # # print(last_inputs)
+        # torch.cuda.current_stream().synchronize()  # 1115 叶博
+        torch.cuda.synchronize()  # 目前认为这也必须有一个同步
         # nvtx.range_pop()
         result = last_inputs
 

@@ -13,7 +13,7 @@ from train import train
 from copy import deepcopy
 
 model_name = 'gpt2'
-total_iter = 50  # 原来是100
+total_iter = 30  # 原来是100
 
 def init_all():
     global args
@@ -110,14 +110,14 @@ if __name__ == "__main__":
     time_all = time2 - time1
     print ('The total time cost is: {}s'.format(time_all))
 
-    time1 = time.time()
-    seed_all(1)
-    select_result = select(original_model, config, dataloader, optimizer, criterion)
-    time2 = time.time()
-    time_all = time2 - time1
-    print ('The total time cost is: {}s'.format(time_all))
+    # time1 = time.time()
+    # seed_all(1)
+    # select_result = select(original_model, config, dataloader, optimizer, criterion)
+    # time2 = time.time()
+    # time_all = time2 - time1
+    # print ('The total time cost is: {}s'.format(time_all))
 
     # compare
     print(compare_result(slice_result, original_result))
-    print(compare_result(select_result, original_result))
+    # print(compare_result(select_result, original_result))
 

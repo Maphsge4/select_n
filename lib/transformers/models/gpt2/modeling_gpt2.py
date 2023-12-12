@@ -995,7 +995,7 @@ class GPT2Model(GPT2PreTrainedModel):
                             hidden_states = hidden_states.to("cuda:" + str(k + 1))
        
         elif self.mode == "slice" or self.mode == "select":
-            # print("hh_start:", torch.cuda.memory_allocated(device=torch.device("cuda")))  # 显存量
+            print("hh_start:", torch.cuda.memory_allocated(device=torch.device("cuda")))  # 显存量
             start = time.time()
             hidden_states = self.hh(
                 hidden_states,

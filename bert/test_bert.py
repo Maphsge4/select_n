@@ -14,7 +14,7 @@ from train import train
 from copy import deepcopy
 
 model_name = 'bert'
-total_iter = 3  # 原来是100
+total_iter = 10  # 原来是100
 
 def init_all():
     global args
@@ -65,7 +65,7 @@ def slice(original_model, config, dataloader, optimizer, criterion):
     model.bert.to_cuda()  # only load embeddings to cuda
     model.cls.cuda()  # load final lm head to cuda
 
-    tmp = validate(model_name, model, dataloader, criterion, 0, print_freq=1000, preserve_result=True)
+    tmp = validate(model_name, model, dataloader, criterion, 0, print_freq=1000, preserve_result=False)
     del model.bert
     del model.cls
 
@@ -73,12 +73,13 @@ def slice(original_model, config, dataloader, optimizer, criterion):
 
 def select(original_model, config, dataloader, optimizer, criterion):
     model = deepcopy(original_model)
-    model.mode = "slice"
+    model.bert.mode = "select"
     
     mslices : List[nn.Module] = []
     for i, layer_module in enumerate(model.bert.encoder.layer):
         mslices.append(layer_module)
-    model.bert.encoder = offload_model(  # 改select_model！
+    
+    model.bert.encoder = select_model(  # 改select_model！
         model=mslices, # 原生模型
         device=torch.device("cuda"), # 用于计算向前和向后传播的设备
         offload_device=torch.device("cpu"), # 模型将存储在其上的offload 设备
@@ -123,6 +124,7 @@ if __name__ == "__main__":
     time_all = time2 - time1
     print ('The total time cost is: {}s'.format(time_all))
     torch.cuda.empty_cache()
+    del slice_result
 
     time1 = time.time()
     seed_all(1)
@@ -131,20 +133,21 @@ if __name__ == "__main__":
     time_all = time2 - time1
     print ('The total time cost is: {}s'.format(time_all))
     torch.cuda.empty_cache()
+    del original_result
 
-    # compare
-    print(compare_result(slice_result, original_result))
-    del slice_result
-
-    time1 = time.time()
-    seed_all(1)
-    select_result = select(original_model, config, dataloader, optimizer, criterion)
-    time2 = time.time()
-    time_all = time2 - time1
-    print ('The total time cost is: {}s'.format(time_all))
-    torch.cuda.empty_cache()
-
-    # compare
+    # # compare
     # print(compare_result(slice_result, original_result))
-    print(compare_result(select_result, original_result))
+    # del slice_result
+
+    # time1 = time.time()
+    # seed_all(1)
+    # select_result = select(original_model, config, dataloader, optimizer, criterion)
+    # time2 = time.time()
+    # time_all = time2 - time1
+    # print ('The total time cost is: {}s'.format(time_all))
+    # torch.cuda.empty_cache()
+
+    # # compare
+    # # print(compare_result(slice_result, original_result))
+    # print(compare_result(select_result, original_result))
 

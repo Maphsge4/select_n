@@ -11,6 +11,8 @@ from metrics import AverageMeter, ProgressMeter
 from torch.nn.parallel import DistributedDataParallel
 from torch.utils.data import DataLoader
 
+from pickle import dump
+
 
 def validate(
         model_name,
@@ -43,52 +45,65 @@ def validate(
 
     with torch.no_grad():
         end = time.time()
-        gc.collect()
-        with fragile(torch.profiler.profile(record_shapes=True, profile_memory=True, with_stack=True)) as p:
-            batch_tile_list = []
-            for i, (images, target) in enumerate(val_loader):
-                if i == prof_step:  # add profile
-                    prof.start_profile()
-                if device_id is not None:
-                    images = images.cuda(device_id, non_blocking=True)
-                    target = target.cuda(device_id, non_blocking=True)
+        # gc.collect()
+        # with fragile(torch.profiler.profile(record_shapes=True, profile_memory=True, with_stack=True)) as p:
+        batch_tile_list = []
 
-                # compute output
-                output = model(images)
-                if(i == 1):
-                    pass
-                if model_name == "gpt2":
-                    output = output.last_hidden_state
-                # print(model)
-                # loss = criterion(output[0], target)
-                # print("loss: ", loss)  # debug
+        # tell CUDA to start recording memory allocations
+        torch.cuda.memory._record_memory_history(enabled='all')
+        
+        for i, (images, target) in enumerate(val_loader):
+            if i == prof_step:  # add profile
+                prof.start_profile()
+            if device_id is not None:
+                images = images.cuda(device_id, non_blocking=True)
+                target = target.cuda(device_id, non_blocking=True)
 
-                if i == prof_step:  # add profile
-                    prof.print_model_profile(profile_step=i)
-                    prof.end_profile()
+            # compute output
+            output = model(images)
+            if(i == 1):
+                pass
+            if model_name == "gpt2":
+                output = output.last_hidden_state
+            # print(model)
+            # loss = criterion(output[0], target)
+            # print("loss: ", loss)  # debug
 
-                # measure accuracy and record loss
-                # acc1, acc5 = accuracy(output, target, topk=(1, 5))
-                # losses.update(loss.item(), images.size(0))
-                # top1.update(acc1[0], images.size(0))
-                # top5.update(acc5[0], images.size(0))
+            if i == prof_step:  # add profile
+                prof.print_model_profile(profile_step=i)
+                prof.end_profile()
 
-                # measure elapsed time
-                tmp = time.time() - end
-                batch_time.update(tmp)
-                batch_tile_list.append(tmp)
-                end = time.time()
+            # measure accuracy and record loss
+            # acc1, acc5 = accuracy(output, target, topk=(1, 5))
+            # losses.update(loss.item(), images.size(0))
+            # top1.update(acc1[0], images.size(0))
+            # top5.update(acc5[0], images.size(0))
 
-                if i % print_freq == 0:
-                    progress.display(i)
-                    
-                print("end_max:", torch.cuda.max_memory_allocated(device=torch.device("cuda")))  # 显存量
-                print("end_now", torch.cuda.memory_allocated(device=torch.device("cuda")))  # 显存量
+            # measure elapsed time
+            tmp = time.time() - end
+            batch_time.update(tmp)
+            batch_tile_list.append(tmp)
+            end = time.time()
 
-            gc.collect()
-        p.export_memory_timeline(str(trace_dir.joinpath(f"linear_stack_{now}.html")), torch.cuda.current_device())
+            if i % print_freq == 0:
+                progress.display(i)
+                
+            print("end_max:", torch.cuda.max_memory_allocated(device=torch.device("cuda")))  # 显存量
+            print("end_now", torch.cuda.memory_allocated(device=torch.device("cuda")))  # 显存量
+
+            # gc.collect()
+        # p.export_memory_timeline(str(trace_dir.joinpath(f"linear_stack_{now}.html")), torch.cuda.current_device())
+        
+        # save a snapshot of the memory allocations
+        s = torch.cuda.memory._snapshot()
 
         print("batch_time_list", batch_tile_list)
+
+        with open(f"snapshot.pickle", "wb") as f:
+            dump(s, f)
+
+        # tell CUDA to stop recording memory allocations now
+        torch.cuda.memory._record_memory_history(enabled=None)
 
         # TODO: this should also be done with the ProgressMeter
         # print(
