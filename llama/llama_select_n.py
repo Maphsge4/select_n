@@ -5,10 +5,10 @@ import torch
 import torch.nn as nn
 from torch.optim import SGD, Adam
 from dummy_dataloader import prepare_dataloader
-from lib.my_offload import OffloadModel
+from lib.select_n import OffloadModel
 from lib.transformers import LlamaConfig, LlamaForCausalLM
 from utils import seed_all, get_parser
-from validate import validate
+from validate_old import validate
 from train import train
 
 model_name = 'llama'
@@ -23,10 +23,10 @@ def main():
 
     config = LlamaConfig.from_json_file("./llama/llama_7b_config.json")
     model =  LlamaForCausalLM(config=config)
-    model.model.mode = "slice"
+    model.model.mode = "select"
     print(f"=> model params: {sum(p.numel() for p in model.parameters())}")
 
-    dataloader = prepare_dataloader(4 * args.batch_size, args.batch_size, config.vocab_size)
+    dataloader = prepare_dataloader(2 * args.batch_size, args.batch_size, config.vocab_size)
     optimizer = Adam(model.parameters(), lr=args.lr)
     criterion = nn.MSELoss()
 
@@ -41,9 +41,9 @@ def main():
         num_slices=10, # currently not used
         checkpoint_activation=False,
         num_microbatches=1,
-        device_list=[0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1] + [0] * 22
+        device_list=[1, 0] * 16
     )
-    model.cuda()
+    model.to_cuda()
 
     print("现在的")
     print("max:", torch.cuda.max_memory_allocated(device=torch.device("cuda")))  # 显存量

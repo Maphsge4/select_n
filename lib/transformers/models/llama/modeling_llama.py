@@ -717,6 +717,17 @@ class LlamaModel(LlamaPreTrainedModel):
                 use_cache=use_cache,
             )  # maphsge4 add offload
             print("hh_end:", torch.cuda.memory_allocated(device=torch.device("cuda")))  # 显存量
+        elif self.mode == "select":
+            print("hh_start:", torch.cuda.memory_allocated(device=torch.device("cuda")))  # 显存量
+            hidden_states = self.layers(
+                hidden_states,
+                attention_mask=attention_mask,
+                position_ids=position_ids,
+                past_key_value=None,
+                output_attentions=output_attentions,
+                use_cache=use_cache,
+            )  # maphsge4 add offload
+            print("hh_end:", torch.cuda.memory_allocated(device=torch.device("cuda")))  # 显存量
             
         hidden_states = self.norm(hidden_states)
 
@@ -752,6 +763,11 @@ class LlamaForCausalLM(LlamaPreTrainedModel):
         self.model.embed_tokens.cuda()
         self.model.norm.cuda()
         self.lm_head.cuda()
+
+        if self.model.mode == "select":
+            for i, m in enumerate(self.model.layers.model_slices):
+                if self.model.layers.device_list[i] == 1:
+                    self.model.layers.model_slices[i].cuda()
 
     def get_input_embeddings(self):
         return self.model.embed_tokens
