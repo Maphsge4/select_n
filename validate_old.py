@@ -41,7 +41,7 @@ def validate(
 
     prof = FlopsProfiler(model)  # add profiler
     # prof_step = len(val_loader) // 3  # 整除3，所以会在33%的时候输出profile！
-    prof_step = 3  # debug
+    prof_step = 1  # debug
 
     with torch.no_grad():
         end = time.time()
@@ -65,6 +65,8 @@ def validate(
                 pass
             if model_name == "gpt2":
                 output = output.last_hidden_state
+            
+            del output
             # print(model)
             # loss = criterion(output[0], target)
             # print("loss: ", loss)  # debug
@@ -109,6 +111,7 @@ def validate(
         # print(
         #     " * Acc@1 {top1.avg:.3f} Acc@5 {top5.avg:.3f}".format(top1=top1, top5=top5)
         # )
+    
 
     return top1.avg
 

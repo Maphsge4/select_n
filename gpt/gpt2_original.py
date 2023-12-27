@@ -23,13 +23,14 @@ def main():
     device_id = 0
     torch.cuda.set_device(device_id)
 
-    config = GPT2Config.from_json_file("./gpt2/gpt2_large_config.json")
+    config = GPT2Config.from_json_file("./gpt/gpt2_large_config.json")
     model = GPT2Model(config=config)
     model.mode = "original"
     model.cuda()
     print(f"=> model params: {sum(p.numel() for p in model.parameters())}")
 
-    dataloader = prepare_dataloader(2 * args.batch_size, args.batch_size, config.vocab_size)  # 原来是4
+    # dataloader = prepare_dataloader(2 * args.batch_size, args.batch_size, config.vocab_size)  # 原来是4
+    dataloader = prepare_dataloader(2, 1, 50257)  # 原来是4
     optimizer = Adam(model.parameters(), lr=args.lr)
     criterion = nn.MSELoss()
 

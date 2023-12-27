@@ -2421,7 +2421,7 @@ class GenerationMixin:
 
             # stop if we exceed the maximum length
             if stopping_criteria(input_ids, scores):
-                this_peer_finished = True
+                this_peer_finished = True  # yzs
 
             if this_peer_finished and not synced_gpus:
                 break

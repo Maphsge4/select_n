@@ -708,7 +708,7 @@ class GPT2Model(GPT2PreTrainedModel):
         # Initialize weights and apply final processing
         self.post_init()
 
-        self.mode = None
+        self.mode = "original"
 
     def to_cuda(self):
         self.wte = self.wte.cuda()
@@ -925,6 +925,7 @@ class GPT2Model(GPT2PreTrainedModel):
         all_hidden_states = () if output_hidden_states else None
 
         if self.mode == "original":
+            print("----------------------original mode----------------------")
             for i, (block, layer_past) in enumerate(zip(self.h, past_key_values)):  # 原来是h
                 # Model parallel
                 if self.model_parallel:
@@ -1096,6 +1097,7 @@ class GPT2LMHeadModel(GPT2PreTrainedModel):
         self.lm_head = new_embeddings
 
     def prepare_inputs_for_generation(self, input_ids, past_key_values=None, inputs_embeds=None, **kwargs):
+        print("----------------------prepare_inputs_for_generation----------------------")
         token_type_ids = kwargs.get("token_type_ids", None)
         # only last token for inputs_ids if past is defined in kwargs
         if past_key_values:

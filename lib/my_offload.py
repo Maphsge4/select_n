@@ -506,9 +506,9 @@ class OffloadModel(nn.Module):
         # arg type.
         # print(model, type(model))  # debug
         if type(model) == list:
-            for m in model:  # model的24层，总共循环24次
-                for p in m.parameters():  # 每一层的参数
-                    p.data = p.data.pin_memory()
+            # for m in model:  # model的24层，总共循环24次
+            #     for p in m.parameters():  # 每一层的参数
+            #         p.data = p.data.pin_memory()
             # This is already sharded using the auto shard functinality.
             for i, m in enumerate(model):
                 self.model_slices.append(

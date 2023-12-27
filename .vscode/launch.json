@@ -25,7 +25,7 @@
             "name": "GPT2 Slice",
             "type": "python",
             "request": "launch",
-            "module": "gpt2.gpt2_slice",
+            "module": "gpt.gpt2_slice",
             "console": "integratedTerminal",
             "justMyCode": false
         },
@@ -33,7 +33,7 @@
             "name": "GPT2 Original",
             "type": "python",
             "request": "launch",
-            "module": "gpt2.gpt2_original",
+            "module": "gpt.gpt2_original",
             "console": "integratedTerminal",
             "justMyCode": false
         },
@@ -41,9 +41,21 @@
             "name": "GPT2 SELECT n",
             "type": "python",
             "request": "launch",
-            "module": "gpt2.gpt2_select_n",
+            "module": "gpt.gpt2_select_n",
             "console": "integratedTerminal",
             "justMyCode": false
+        },
+        {
+            "name": "GPT2 GENE",
+            "type": "python",
+            "request": "launch",
+            "module": "gpt.gpt2_gene",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "args": [
+                "-m",
+                "slice"
+            ]
         },
         {
             "name": "BERT SELECT n",

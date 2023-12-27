@@ -15,6 +15,7 @@ from lib.transformers import GPT2Config, GPT2Model
 from utils import seed_all, get_parser
 from validate_old import validate
 from train import train
+from generate import generate
 
 model_name = 'gpt2'
 
@@ -55,6 +56,8 @@ def main():
     
     if args.training_or_inference == "inference":
         validate(model_name, model, dataloader, criterion, device_id, print_freq=1000)
+    elif args.training_or_inference == "generate":
+        generate(model_name, model, dataloader, criterion, device_id, print_freq=1000)
     else:
         '''
         # resume from checkpoint if one exists;

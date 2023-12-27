@@ -65,6 +65,13 @@ def get_parser():
         metavar="N",
         help="print frequency (default: 10)",
     )
+
+    parser.add_argument(
+        "-m",
+        "--mode",
+        default="original",
+    )
+
     parser.add_argument(
         "--dist-backend",
         default="nccl",
