@@ -583,6 +583,7 @@ class OffloadModel(nn.Module):
                 # inputs = self._activations[index]
                 inputs = last_inputs  # 叶博改的
                 # start = time.time()
+                print(f"shard {index} forward")
                 nvtx.range_push(f"shard {index} forward")
 
                 # inputs = self.model_slices[index](*inputs)[0]

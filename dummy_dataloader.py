@@ -6,7 +6,7 @@ from torch.utils.data import DataLoader, Dataset
 
 
 class RandomDataset(Dataset):
-    def __init__(self, length, batch_size, vocab_size, seq_len=512):
+    def __init__(self, length, batch_size, vocab_size, seq_len=128):
         self.len = length
         self.batch_size = batch_size
         self.seq_len = seq_len

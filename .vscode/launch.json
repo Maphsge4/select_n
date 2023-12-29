@@ -104,6 +104,18 @@
             "module": "bert.linear_slice",
             "console": "integratedTerminal",
             "justMyCode": false
+        },
+        {
+            "name": "gpt2_generate_original",
+            "type": "python",
+            "request": "launch",
+            "module": "gpt.gpt2_gene",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "args": [
+                "-m",
+                "original"
+            ]
         }
     ]
 }

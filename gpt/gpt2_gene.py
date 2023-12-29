@@ -25,20 +25,22 @@ def main():
     args = parser.parse_args()
     
     seed_all(1)
-    device_id = 1
+    device_id = 0
     torch.cuda.set_device(device_id)
 
     if args.mode == "original":
-        model = GPT2LMHeadModel.from_pretrained("gpt2")
-        tokenizer = GPT2Tokenizer.from_pretrained("gpt2")
+        config = GPT2Config.from_json_file("./gpt/gpt2_large_config.json")
+        model = GPT2LMHeadModel(config=config)
+        # tokenizer = GPT2Tokenizer.from_pretrained("gpt2")
         model.transformer.mode = "original"
 
         model.cuda(device_id)
         print(f"=> model params: {sum(p.numel() for p in model.parameters())}")
 
     elif args.mode == "slice":
-        model = GPT2LMHeadModel.from_pretrained("gpt2")
-        tokenizer = GPT2Tokenizer.from_pretrained("gpt2")
+        config = GPT2Config.from_json_file("./gpt/gpt2_large_config.json")
+        model = GPT2LMHeadModel(config=config)
+        # tokenizer = GPT2Tokenizer.from_pretrained("gpt2")
         model.transformer.mode = "slice"
 
         mslices : List[nn.Module] = []
@@ -58,7 +60,7 @@ def main():
     print("max:", torch.cuda.max_memory_allocated(device=torch.device("cuda")))  # 显存量
     print("now", torch.cuda.memory_allocated(device=torch.device("cuda")))  # 显存量
 
-    dataloader = prepare_dataloader(2 * args.batch_size, args.batch_size, 50257)  # 原来是4
+    dataloader = prepare_dataloader(args.batch_size, args.batch_size, 50257)  # 原来是4
     optimizer = Adam(model.parameters(), lr=args.lr)
     criterion = nn.MSELoss()
     
