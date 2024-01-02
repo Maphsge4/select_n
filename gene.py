@@ -43,17 +43,16 @@ def validate(
     # model.cuda(device_id)
 
     # # tell CUDA to start recording memory allocations
-    # torch.cuda.memory._record_memory_history(enabled='all')
+    torch.cuda.memory._record_memory_history(enabled='all')
 
     for i, (images, target) in enumerate(val_loader):
         if device_id is not None:
+            print(f"input shape: {images.shape}")
             images = images.cuda(device_id, non_blocking=True)
             target = target.cuda(device_id, non_blocking=True)
 
         # compute output
-        output = model.generate(images, max_length=100)
-
-        pass
+        output = model.generate(images, max_length=156)
 
     # save a snapshot of the memory allocations
     s = torch.cuda.memory._snapshot()

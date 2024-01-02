@@ -824,12 +824,15 @@ class GPT2Model(GPT2PreTrainedModel):
         output_hidden_states: Optional[bool] = None,
         return_dict: Optional[bool] = None,
     ) -> Union[Tuple, BaseModelOutputWithPastAndCrossAttentions]:
+        import time
+        t1 = time.time()
         output_attentions = output_attentions if output_attentions is not None else self.config.output_attentions
         output_hidden_states = (
             output_hidden_states if output_hidden_states is not None else self.config.output_hidden_states
         )
         use_cache = use_cache if use_cache is not None else self.config.use_cache
-        use_cache = False  # debug test
+        # use_cache = False  # debug test
+        print(f"use_cache: {use_cache}")
         return_dict = return_dict if return_dict is not None else self.config.use_return_dict
 
         if input_ids is not None and inputs_embeds is not None:
@@ -843,6 +846,8 @@ class GPT2Model(GPT2PreTrainedModel):
             batch_size = inputs_embeds.shape[0]
         else:
             raise ValueError("You have to specify either input_ids or inputs_embeds")
+        
+        # print(f"gpt2.model.forward: input_ids.shape: {input_ids.shape}, past_key_values[0].shape: {None if past_key_values is None else past_key_values[0][0].shape}")
 
         device = input_ids.device if input_ids is not None else inputs_embeds.device
 
@@ -925,7 +930,7 @@ class GPT2Model(GPT2PreTrainedModel):
         all_hidden_states = () if output_hidden_states else None
 
         if self.mode == "original":
-            print("----------------------original mode----------------------")
+            # print("----------------------original mode----------------------")
             for i, (block, layer_past) in enumerate(zip(self.h, past_key_values)):  # 原来是h
                 # Model parallel
                 if self.model_parallel:
@@ -1028,6 +1033,9 @@ class GPT2Model(GPT2PreTrainedModel):
                 if v is not None
             )
 
+        torch.cuda.synchronize()
+        t2 = time.time()
+        print(f"forward time: {t2 - t1}")
         return BaseModelOutputWithPastAndCrossAttentions(
             last_hidden_state=hidden_states,
             past_key_values=presents,
@@ -1097,7 +1105,7 @@ class GPT2LMHeadModel(GPT2PreTrainedModel):
         self.lm_head = new_embeddings
 
     def prepare_inputs_for_generation(self, input_ids, past_key_values=None, inputs_embeds=None, **kwargs):
-        print("----------------------prepare_inputs_for_generation----------------------")
+        # print("----------------------prepare_inputs_for_generation----------------------")
         token_type_ids = kwargs.get("token_type_ids", None)
         # only last token for inputs_ids if past is defined in kwargs
         if past_key_values:
