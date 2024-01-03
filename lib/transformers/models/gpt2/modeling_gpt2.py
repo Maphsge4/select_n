@@ -915,7 +915,7 @@ class GPT2Model(GPT2PreTrainedModel):
 
         hidden_states = self.drop(hidden_states)
 
-        output_shape = input_shape + (hidden_states.size(-1),)
+        output_shape = input_shape + (hidden_states.size(-1),)  # -1
 
         if self.gradient_checkpointing and self.training:
             if use_cache:
@@ -1037,9 +1037,9 @@ class GPT2Model(GPT2PreTrainedModel):
                 if v is not None
             )
 
-        torch.cuda.synchronize()
-        t2 = time.time()
-        print(f"forward time: {t2 - t1}")
+        # torch.cuda.synchronize()
+        # t2 = time.time()
+        # print(f"forward time: {t2 - t1}")
         return BaseModelOutputWithPastAndCrossAttentions(
             last_hidden_state=hidden_states,
             past_key_values=presents,

@@ -11,11 +11,11 @@ import torch.nn as nn
 from torch.optim import SGD, Adam
 from dummy_dataloader import prepare_dataloader
 from lib.my_offload import OffloadModel
-from lib.transformers import GPT2Config, GPT2Model
+from lib.transformers import GPT2Config, GPT2Model, GPT2LMHeadModel, GPT2Tokenizer
+# from transformers import GPT2Config, GPT2Model, GPT2LMHeadModel, GPT2Tokenizer
 from utils import seed_all, get_parser
 from gene import validate
 from train import train
-from lib.transformers import GPT2LMHeadModel, GPT2Tokenizer
 
 model_name = 'gpt2'
 
@@ -27,20 +27,18 @@ def main():
     seed_all(1)
     device_id = 0
     torch.cuda.set_device(device_id)
+    config = GPT2Config.from_json_file("./gpt/gpt2_large_config.json")
+    model = GPT2LMHeadModel.from_pretrained("gpt2-large")
+    # model = GPT2LMHeadModel(config)
+    # tokenizer = GPT2Tokenizer.from_pretrained("gpt2")
 
     if args.mode == "original":
-        config = GPT2Config.from_json_file("./gpt/gpt2_large_config.json")
-        model = GPT2LMHeadModel(config=config)
-        # tokenizer = GPT2Tokenizer.from_pretrained("gpt2")
         model.transformer.mode = "original"
 
         model.cuda(device_id)
         print(f"=> model params: {sum(p.numel() for p in model.parameters())}")
 
     elif args.mode == "slice":
-        config = GPT2Config.from_json_file("./gpt/gpt2_large_config.json")
-        model = GPT2LMHeadModel(config=config)
-        # tokenizer = GPT2Tokenizer.from_pretrained("gpt2")
         model.transformer.mode = "slice"
 
         mslices : List[nn.Module] = []
@@ -58,6 +56,7 @@ def main():
         )
         model.transformer.to_cuda()   # only load embeddings to cuda
 
+    # inputs = tokenizer(["An increasing sequence: one,"], return_tensors="pt")
     print("max:", torch.cuda.max_memory_allocated(device=torch.device("cuda")))  # 显存量
     print("now", torch.cuda.memory_allocated(device=torch.device("cuda")))  # 显存量
 

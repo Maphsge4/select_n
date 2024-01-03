@@ -1,0 +1,68 @@
+=> model params: 124439808
+max: 511148032
+now 511148032
+input shape: torch.Size([32, 128])
+use_cache: True
+forward time: 0.8608529567718506
+use_cache: True
+forward time: 0.035490989685058594
+use_cache: True
+forward time: 0.033345699310302734
+use_cache: True
+forward time: 0.033806562423706055
+use_cache: True
+forward time: 0.033922672271728516
+use_cache: True
+forward time: 0.03385353088378906
+use_cache: True
+forward time: 0.03511619567871094
+use_cache: True
+forward time: 0.03407549858093262
+use_cache: True
+forward time: 0.03515219688415527
+use_cache: True
+forward time: 0.03444218635559082
+use_cache: True
+forward time: 0.03501105308532715
+use_cache: True
+forward time: 0.034856557846069336
+use_cache: True
+forward time: 0.03454923629760742
+use_cache: True
+forward time: 0.03490948677062988
+use_cache: True
+forward time: 0.03445124626159668
+use_cache: True
+forward time: 0.03428316116333008
+use_cache: True
+forward time: 0.03345751762390137
+use_cache: True
+forward time: 0.033930063247680664
+use_cache: True
+forward time: 0.033737897872924805
+use_cache: True
+forward time: 0.034030914306640625
+use_cache: True
+forward time: 0.03417062759399414
+use_cache: True
+forward time: 0.033869028091430664
+use_cache: True
+forward time: 0.033875226974487305
+use_cache: True
+forward time: 0.03381013870239258
+use_cache: True
+forward time: 0.033824920654296875
+use_cache: True
+forward time: 0.033721208572387695
+use_cache: True
+forward time: 0.03378105163574219
+use_cache: True
+forward time: 0.03361105918884277
+tensor([[13979, 25429, 47071,  ..., 15796, 15796, 15796],
+        [20205, 41945,  7480,  ..., 46497, 46497, 46497],
+        [ 6725, 18410, 12897,  ..., 25169,  8751,  8751],
+        ...,
+        [48178, 24993, 23334,  ..., 13993, 13993, 13993],
+        [32882, 23109, 43198,  ..., 17033, 11481, 14845],
+        [37082, 36809,  4830,  ..., 13993, 13993, 13993]], device='cuda:0')
+The total time cost is: 7.106781959533691s

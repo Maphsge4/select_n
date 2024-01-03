@@ -44,6 +44,7 @@ def validate(
 
     # # tell CUDA to start recording memory allocations
     torch.cuda.memory._record_memory_history(enabled='all')
+    use_cache = True
 
     for i, (images, target) in enumerate(val_loader):
         if device_id is not None:
@@ -52,7 +53,8 @@ def validate(
             target = target.cuda(device_id, non_blocking=True)
 
         # compute output
-        output = model.generate(images, max_length=156)
+        output = model.generate(images, max_length=156, use_cache=use_cache)
+        print(output)
 
         pass
 
