@@ -48,6 +48,7 @@ def main():
             mslices.append(layer_module)
 
         model.transformer.hh = OffloadModel( # 使用 OffloadModel 来包装模型
+            name="gpt2", # 模型名称
             model=mslices, # 原生模型
             device=torch.device("cuda"), # 用于计算向前和向后传播的设备
             offload_device=torch.device("cpu"), # 模型将存储在其上的offload 设备

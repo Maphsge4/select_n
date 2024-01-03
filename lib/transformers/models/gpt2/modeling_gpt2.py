@@ -1003,15 +1003,19 @@ class GPT2Model(GPT2PreTrainedModel):
         elif self.mode == "slice" or self.mode == "select":
             print("hh_start:", torch.cuda.memory_allocated(device=torch.device("cuda")))  # 显存量
             start = time.time()
-            hidden_states = self.hh(
+            hidden_states, presents, all_self_attentions, all_cross_attentions = self.hh(
                 hidden_states,
+                add_cross_attention=self.config.add_cross_attention,
                 layer_past=past_key_values,  # 原本是layer_past
+                # layer_past=None,
                 attention_mask=attention_mask,
                 head_mask=head_mask,  # 原本有[i]
+                # head_mask=None,
                 encoder_hidden_states=encoder_hidden_states,
                 encoder_attention_mask=encoder_attention_mask,
                 use_cache=use_cache,
                 output_attentions=output_attentions,
+                
             )  # maphsge4 add offload
             tmp = time.time() - start
             # print("self.hh time:", tmp)  # debug

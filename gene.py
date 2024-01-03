@@ -54,6 +54,8 @@ def validate(
         # compute output
         output = model.generate(images, max_length=156)
 
+        pass
+
     # save a snapshot of the memory allocations
     s = torch.cuda.memory._snapshot()
     with open(f"snapshot.pickle", "wb") as f:

@@ -54,6 +54,18 @@
             "justMyCode": false,
             "args": [
                 "-m",
+                "original"
+            ]
+        },
+        {
+            "name": "GPT2 GENE SLICE",
+            "type": "python",
+            "request": "launch",
+            "module": "gpt.gpt2_gene",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "args": [
+                "-m",
                 "slice"
             ]
         },

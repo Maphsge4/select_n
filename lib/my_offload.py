@@ -552,7 +552,7 @@ class OffloadModel(nn.Module):
         # Number of microbatches to run per batch on the device
         self._num_microbatches = num_microbatches
 
-    def forward(self, *inputs: Any, **_: Any) -> Any:  # 需要改的
+    def forward(self, *inputs: Any, add_cross_attention: bool, **_: Any) -> Any:  # 需要改的
         # `apply` calls the `forward` function of the `OffloadFunction` class
         # and the `forward` function calls `inputs` on the first model shard.
         # Please see https://pytorch.org/docs/stable/autograd.html#function for more details.
@@ -563,15 +563,16 @@ class OffloadModel(nn.Module):
             return OffloadFunction.apply(*inputs, torch.tensor([], requires_grad=True), self)  # 准备加_
 
         self._activations = []
-        # if self.name == "gpt2":
-        #     past_key_values = _['layer_past']  # maphsge4 add
-        #     head_mask = _['head_mask']  # maphsge4 add
-        last_inputs = inputs
+        presents = ()
+        all_self_attentions = ()
+        all_cross_attentions = ()
+        past_key_values = _['layer_past']
+        head_mask = _['head_mask']
+        use_cache = _['use_cache']  # maphsge4 add
+        
+        last_inputs = inputs[0]
         for index in range(-1, len(self.model_slices)):
             if index >= 0:
-                # if self.name == "gpt2":
-                #     _['layer_past'] = past_key_values[index]  # maphsge4 add
-                #     _['head_mask'] = head_mask[index]  # maphsge4 add
                 # TODO(anj-s): This might be a redundant call since we have the previous
                 # activation on the device already.
                 # print(index)  # activation
@@ -589,7 +590,10 @@ class OffloadModel(nn.Module):
                 # inputs = self.model_slices[index](*inputs)[0]
                 torch.cuda.synchronize()  # 1115 test
                 
-                inputs = self.model_slices[index](*inputs)
+                if self.name == "gpt2":
+                    inputs = self.model_slices[index](hidden_states=inputs, use_cache=use_cache, layer_past=past_key_values[index], head_mask=head_mask[index])  # 原来有[0]
+                else:
+                    inputs = self.model_slices[index](*inputs)
                 nvtx.range_pop()
                 # tmp = time.time() - start
                 # print("self.hh time:", tmp)  # debug
@@ -598,9 +602,32 @@ class OffloadModel(nn.Module):
             # self._activations.append(inputs)
 
             if index >= 0:
+                if self.name == "gpt2":
+                    hidden_states = inputs[0]  # hidden_states显存变小是因为本身有值，赋的新值比原来的值小
+                    # print("hidden_states后的显存量：", torch.cuda.memory_allocated(device=torch.device("cuda")))
+                    # hidden_states = hidden_states.to("cpu")  # to cpu之后肯定显存不会下降，因为hidden_states是output[0]的引用，output[0]没删，显存就不会变小
+                    # print("hidden_states后的显存量：", torch.cuda.memory_allocated(device=torch.device("cuda")))
+                    # hidden_states = hidden_states.to("cuda")  # 再次to cuda的话，是一个复制，所以显存又会变大！
+                    # print("hidden_states后的显存量：", torch.cuda.memory_allocated(device=torch.device("cuda")))
+
+                    if _['use_cache'] is True:
+                        presents = presents + (inputs[1],)
+
+                    if _['output_attentions']:
+                        all_self_attentions = all_self_attentions + (inputs[2 if _['use_cache'] else 1],)
+                        if add_cross_attention:
+                            all_cross_attentions = all_cross_attentions + (inputs[3 if _['use_cache'] else 2],)
+
+                    # # Model Parallel: If it's the last layer for that device, put things on the next device
+                    # if self.model_parallel:
+                    #     for k, v in self.device_map.items():
+                    #         if i == v[-1] and "cuda:" + str(k) != self.last_device:
+                    #             hidden_states = hidden_states.to("cuda:" + str(k + 1))
+                        
+
                 # nvtx.range_push(f"a.cpu()")
                 # self._activations[index] = tuple([a.cpu() for a in list(self._activations[index])])
-                last_inputs = inputs  # 叶博修改的
+                last_inputs = inputs[0]  # 叶博修改的
                 # nvtx.range_pop()
             
         # result = self._activations[-1]
@@ -608,4 +635,8 @@ class OffloadModel(nn.Module):
         # torch.cuda.synchronize()  # 在slice模式下，如果只在这里synchronize，bert的结果也不对
         result = last_inputs
         # print("result[0]", result[0])  # debug
-        return result[0] if len(result) == 1 else result
+
+        if use_cache is False:
+            return (result, None, None, None) 
+        else:
+            return (result, presents,all_self_attentions, all_cross_attentions)
